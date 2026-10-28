@@ -1,0 +1,1928 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>OPERATION CASH MANAGMENT SYSTEM – Daily Operations Money</title>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#eef2f1;--panel:#fff;--ink:#14232b;--mute:#5d6e75;--line:#d5dedc;--in:#0f766e;--out:#b0243f;--warn:#9a6700;--warnbg:#fff4d6;--brand:#14323b;--brand-ink:#e6f1ef;
+box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#0e171b;--panel:#16232a;--ink:#e4eeed;--mute:#8fa3a8;--line:#27393f;--in:#4fd1c0;--out:#ff7a93;--warn:#f2c14e;--warnbg:#3a2f12;--brand:#0a1f26}}
+:root[data-theme="dark"]{--bg:#0e171b;--panel:#16232a;--ink:#e4eeed;--mute:#8fa3a8;--line:#27393f;--in:#4fd1c0;--out:#ff7a93;--warn:#f2c14e;--warnbg:#3a2f12;--brand:#0a1f26}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.45 'IBM Plex Sans',system-ui,sans-serif}
+.num{font-family:'IBM Plex Mono',ui-monospace,monospace;font-variant-numeric:tabular-nums}
+.mute{color:var(--mute)}
+header{background:var(--brand);color:var(--brand-ink);padding:14px 20px;display:flex;flex-wrap:wrap;gap:12px;align-items:center;justify-content:space-between}
+header h1{margin:0;font-size:19px;font-weight:600}
+header small{opacity:.75;display:block;font-weight:400;font-size:12px}
+.hr{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.who{font-size:13px;opacity:.9;margin-right:4px}
+header button{background:transparent;color:inherit;border:1px solid rgba(230,241,239,.4);padding:6px 11px;border-radius:6px;cursor:pointer;font:inherit;font-size:13px}
+nav{background:var(--panel);border-bottom:1px solid var(--line);display:flex;gap:2px;padding:0 10px;overflow-x:auto}
+nav button{border:0;background:none;color:var(--mute);padding:12px 14px;cursor:pointer;font:inherit;border-bottom:2px solid transparent;white-space:nowrap}
+nav button.on{color:var(--ink);border-bottom-color:var(--in);font-weight:500}
+nav b{background:var(--out);color:#fff;border-radius:9px;font-size:11px;padding:1px 6px;margin-left:5px}
+main{max-width:1100px;margin:0 auto;padding:18px 14px 40px;display:grid;gap:16px}
+.kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:12px}
+.kpi,.card{background:var(--panel);border:1px solid var(--line);border-radius:8px;padding:14px 16px}
+.kpi span{color:var(--mute);font-size:13px}
+.kpi b{display:block;font-size:22px;font-weight:500;margin-top:2px;overflow-wrap:anywhere}
+.kpi.in b{color:var(--in)}.kpi.out b{color:var(--out)}
+.kpi.close{background:var(--brand);color:var(--brand-ink);border-color:var(--brand)}.kpi.close span{color:#9fc0bb}
+h2{font-size:15px;margin:0 0 12px;font-weight:600}
+h2.cur{margin:4px 0 -6px;color:var(--mute);font-size:13px;letter-spacing:.06em}
+.cols{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.6fr);gap:16px;align-items:start}
+.stack{display:grid;gap:16px}
+@media(max-width:820px){.cols{grid-template-columns:1fr}}
+form{display:grid;gap:10px}
+label{display:grid;gap:3px;font-size:13px;color:var(--mute)}
+label.chk{display:flex;gap:8px;align-items:center;color:var(--ink)}
+label.chk input{width:auto}
+input,select{font:inherit;color:var(--ink);background:var(--bg);border:1px solid var(--line);border-radius:6px;padding:8px 10px;width:100%}
+input:focus-visible,select:focus-visible,button:focus-visible{outline:2px solid var(--in);outline-offset:1px}
+.seg{display:grid;grid-template-columns:1fr 1fr;border:1px solid var(--line);border-radius:6px;overflow:hidden}
+.seg button{border:0;padding:9px;background:var(--bg);color:var(--mute);cursor:pointer;font:inherit}
+.seg button.on.in{background:var(--in);color:#fff}.seg button.on.out{background:var(--out);color:#fff}
+.primary{background:var(--brand);color:var(--brand-ink);border:0;border-radius:6px;padding:10px;cursor:pointer;font:inherit;font-weight:500}
+.ghost{border:1px solid var(--line);background:var(--bg);color:var(--ink);border-radius:6px;padding:6px 10px;cursor:pointer;font:inherit;font-size:13px}
+.ghost.bad:hover{color:var(--out);border-color:var(--out)}
+.err{color:var(--out);font-size:13px;min-height:18px}
+.warn{background:var(--warnbg);color:var(--warn);border-radius:6px;padding:10px 12px;font-size:14px}
+.note{color:var(--mute);font-size:13px}
+.bars{display:flex;align-items:flex-end;gap:10px;height:150px;padding-top:8px}
+.day{flex:1;display:flex;flex-direction:column;align-items:center;gap:4px;height:100%;justify-content:flex-end;font-size:12px;color:var(--mute)}
+.pair{display:flex;align-items:flex-end;gap:3px;height:100%;width:100%;justify-content:center}
+.pair i{display:block;width:40%;max-width:22px;border-radius:3px 3px 0 0;min-height:2px}
+.pair i.a{background:var(--in)}.pair i.b{background:var(--out)}
+.legend{display:flex;gap:14px;font-size:12px;color:var(--mute);margin-top:8px}
+.legend s{display:inline-block;width:10px;height:10px;border-radius:2px;margin-right:5px;text-decoration:none}
+.tools{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:10px}
+.tools input{flex:1;min-width:140px}.tools select{width:auto}
+.tw{overflow-x:auto}
+table{width:100%;border-collapse:collapse;min-width:560px}
+th,td{text-align:left;padding:8px 6px;border-bottom:1px solid var(--line);white-space:nowrap;vertical-align:middle}
+th{font-weight:500;color:var(--mute);font-size:13px}
+td.r,th.r{text-align:right}
+td.wrap{white-space:normal;min-width:160px}
+.in-t{color:var(--in)}.out-t{color:var(--out)}
+.empty{padding:20px;text-align:center;color:var(--mute)}
+.bd{display:inline-block;font-size:12px;padding:1px 8px;border-radius:10px;border:1px solid var(--line);color:var(--mute)}
+.bd.posted,.bd.reconciled{color:var(--in);border-color:var(--in)}
+.bd.pending,.bd.closed{color:var(--warn);border-color:var(--warn)}
+.bd.rejected,.bd.void{color:var(--out);border-color:var(--out)}
+.chips{display:flex;flex-wrap:wrap;gap:8px}
+.sum{display:grid;grid-template-columns:auto 1fr;gap:4px 16px;font-size:14px}
+.sum span{color:var(--mute)}.sum b{text-align:right;font-weight:500}
+.login{min-height:100vh;display:grid;place-items:center;padding:16px}
+.login .card{width:100%;max-width:360px;display:grid;gap:12px}
+.login h1{margin:0;font-size:22px}
+dialog{border:1px solid var(--line);border-radius:10px;background:var(--panel);color:var(--ink);padding:18px;width:min(92vw,380px)}
+dialog::backdrop{background:rgba(0,0,0,.45)}
+dialog h3{margin:0 0 10px;font-size:16px}
+#dbody{display:grid;gap:10px;margin-bottom:6px}
+.drow{display:flex;gap:8px;justify-content:flex-end}.drow .primary{padding:8px 16px}
+#toast{position:fixed;left:50%;bottom:20px;transform:translate(-50%,20px);background:var(--brand);color:var(--brand-ink);padding:10px 16px;border-radius:8px;opacity:0;pointer-events:none;transition:.2s;font-size:14px;max-width:90vw;z-index:9}
+#toast.show{opacity:1;transform:translate(-50%,0)}#toast.bad{background:var(--out);color:#fff}
+/* consignments grid + DATA page */
+.gtools{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-bottom:10px}
+.gtools .primary{padding:6px 16px}
+.gw{overflow:auto;max-height:68vh;border:1px solid var(--line);border-radius:6px}
+table.grid{table-layout:fixed;width:100%;min-width:1420px;border-collapse:separate;border-spacing:0}
+.grid th{position:sticky;top:0;z-index:1;background:var(--panel);border-bottom:1px solid var(--line);border-right:1px solid var(--line);padding:8px;overflow:hidden;text-overflow:ellipsis}
+.grid td{padding:0;border-bottom:1px solid var(--line);border-right:1px solid var(--line)}
+.grid td.n,.grid th.n{text-align:center;color:var(--mute);font-size:12px;padding:0 4px}
+.grid input[type=checkbox]{width:auto;padding:0;margin:0 4px 0 0;vertical-align:middle}
+.grid input.gc{border:0;border-radius:0;background:transparent;padding:9px 8px;min-width:0}
+.grid input.gc.r{text-align:right;font-family:'IBM Plex Mono',ui-monospace,monospace}
+.grid input.gc:focus,.grid input.gc:focus-visible{outline:2px solid var(--in);outline-offset:-2px;background:transparent}
+.grid tr.sel td{background:color-mix(in srgb,var(--in) 10%,transparent)}
+.grid td.bad,.grid tr.sel td.bad{background:color-mix(in srgb,var(--out) 16%,transparent);box-shadow:inset 0 0 0 1px var(--out)}
+.grid select.gc{border:0;border-radius:0;background:transparent;padding:9px 6px;width:100%;color:var(--ink);font:inherit}
+.grid select.gc:focus,.grid select.gc:focus-visible{outline:2px solid var(--in);outline-offset:-2px}
+.grid tr.lock td{background:color-mix(in srgb,var(--mute) 10%,transparent)}
+.grid input.gc[readonly]{color:var(--mute);cursor:default}
+.grid td.gd{padding:0 8px;white-space:nowrap;font-size:13px;color:var(--mute)}
+.grid td.gd .bd{font-size:11px;padding:0 6px}
+.mbar{display:flex;flex-wrap:wrap;gap:12px 24px;align-items:center;margin-bottom:8px}
+.mbar label{min-width:190px}
+.gerr{color:var(--out);font-size:13px;margin-top:8px}
+.dirty{color:var(--warn);font-weight:500}
+table.grid.rgrid{min-width:2510px}
+/* BONDS REGISTRY grid (separate from the Consignments grid) */
+table.grid.bgrid{min-width:1290px}
+.grid input.rc{border:0;border-radius:0;background:transparent;padding:9px 8px;min-width:0}
+.grid input.rc.r{text-align:right;font-family:'IBM Plex Mono',ui-monospace,monospace}
+.grid input.rc:focus,.grid input.rc:focus-visible{outline:2px solid var(--in);outline-offset:-2px;background:transparent}
+/* PAYMENT RECORDS grid (separate from the Consignments and Bonds grids) */
+table.grid.pgrid{min-width:1420px}
+.grid input.pc{border:0;border-radius:0;background:transparent;padding:9px 8px;min-width:0}
+.grid input.pc.r{text-align:right;font-family:'IBM Plex Mono',ui-monospace,monospace}
+.grid input.pc:focus,.grid input.pc:focus-visible{outline:2px solid var(--in);outline-offset:-2px;background:transparent}
+.grid input.pc[readonly]{color:var(--mute);cursor:default}
+.grid select.pc{border:0;border-radius:0;background:transparent;padding:9px 6px;width:100%;color:var(--ink);font:inherit}
+.grid select.pc:focus,.grid select.pc:focus-visible{outline:2px solid var(--in);outline-offset:-2px}
+</style>
+<style id="polish-css">
+/* ===== Cashbook UI polish layer (CSS only — no behaviour changes) ===== */
+:root{
+  --radius:10px; --radius-sm:7px;
+  --shadow-1:0 1px 2px rgba(16,35,43,.06),0 1px 3px rgba(16,35,43,.05);
+  --shadow-2:0 4px 14px rgba(16,35,43,.10),0 2px 4px rgba(16,35,43,.05);
+  --ring:0 0 0 3px color-mix(in srgb,var(--in) 28%,transparent);
+  --ease:cubic-bezier(.2,.7,.2,1);
+}
+html{-webkit-text-size-adjust:100%;scroll-behavior:smooth}
+body{
+  background:
+    radial-gradient(1200px 380px at 50% -120px,color-mix(in srgb,var(--in) 9%,transparent),transparent 70%),
+    var(--bg);
+  -webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility;
+  letter-spacing:.005em;
+}
+::selection{background:color-mix(in srgb,var(--in) 30%,transparent)}
+*{scrollbar-width:thin;scrollbar-color:color-mix(in srgb,var(--mute) 45%,transparent) transparent}
+::-webkit-scrollbar{width:10px;height:10px}
+::-webkit-scrollbar-thumb{background:color-mix(in srgb,var(--mute) 40%,transparent);border-radius:10px;border:2px solid transparent;background-clip:content-box}
+::-webkit-scrollbar-thumb:hover{background-color:color-mix(in srgb,var(--mute) 65%,transparent)}
+
+/* ---- header ---- */
+header{
+  background:linear-gradient(135deg,var(--brand) 0%,color-mix(in srgb,var(--brand) 78%,var(--in)) 100%);
+  box-shadow:0 2px 10px rgba(0,0,0,.18);position:sticky;top:0;z-index:20;
+  padding:12px 22px;
+}
+header h1{font-size:20px;letter-spacing:.01em;display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+header h1::before{content:"";width:30px;height:30px;border-radius:8px;flex:none;
+  background:linear-gradient(135deg,var(--in),#2dd4bf);box-shadow:inset 0 0 0 1px rgba(255,255,255,.25)}
+header small{margin-left:2px}
+header .who{background:rgba(255,255,255,.10);padding:5px 12px;border-radius:999px;font-weight:500}
+header button{border-radius:999px;padding:6px 14px;transition:background .15s var(--ease),border-color .15s}
+header button:hover{background:rgba(255,255,255,.14);border-color:rgba(255,255,255,.7)}
+
+/* ---- navigation ---- */
+nav{position:sticky;top:57px;z-index:15;box-shadow:var(--shadow-1);padding:0 14px;scrollbar-width:none}
+nav::-webkit-scrollbar{display:none}
+nav button{padding:13px 16px;font-size:14px;position:relative;transition:color .15s,background .15s;border-radius:6px 6px 0 0}
+nav button:hover{color:var(--ink);background:color-mix(in srgb,var(--in) 7%,transparent)}
+nav button.on{border-bottom-width:3px;color:var(--in)}
+nav button::before{display:inline-block;margin-right:7px;font-size:13px;opacity:.75;width:1.1em;text-align:center}
+nav button[data-t="dash"]::before{content:"◧"}
+nav button[data-t="entries"]::before{content:"✎"}
+nav button[data-t="approvals"]::before{content:"✔"}
+nav button[data-t="close"]::before{content:"⏻"}
+nav button[data-t="cargo"]::before{content:"▤"}
+nav button[data-t="bonds"]::before{content:"❖"}
+nav button[data-t="pay"]::before{content:"$"}
+nav button[data-t="data"]::before{content:"▣"}
+nav button[data-t="loans"]::before{content:"⇄"}
+nav button[data-t="leave"]::before{content:"☼"}
+nav button[data-t="accounts"]::before{content:"▥"}
+nav button[data-t="staff"]::before{content:"☺"}
+nav button[data-t="audit"]::before{content:"☰"}
+nav b{box-shadow:0 0 0 2px var(--panel);font-weight:600}
+
+/* ---- layout, cards ---- */
+main{padding:22px 16px 56px;gap:18px;animation:fadeUp .28s var(--ease)}
+@keyframes fadeUp{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+.kpi,.card{border-radius:var(--radius);box-shadow:var(--shadow-1);transition:box-shadow .2s var(--ease),transform .2s var(--ease)}
+.kpi:hover{box-shadow:var(--shadow-2);transform:translateY(-1px)}
+.card>h2,.kpi+h2{position:relative}
+.card>h2{font-size:16px;padding-bottom:10px;border-bottom:1px solid var(--line);margin-bottom:14px}
+.kpi{border-left:4px solid var(--line)}
+.kpi.in{border-left-color:var(--in)}.kpi.out{border-left-color:var(--out)}
+.kpi.close{border-left-color:#2dd4bf;background:linear-gradient(135deg,var(--brand),color-mix(in srgb,var(--brand) 75%,var(--in)))}
+.kpi span{text-transform:uppercase;letter-spacing:.06em;font-size:11.5px;font-weight:500}
+.kpi b{font-size:24px;font-weight:600;letter-spacing:-.01em}
+h2.cur{font-weight:600;letter-spacing:.1em;text-transform:uppercase;font-size:12px;padding:0 2px}
+
+/* ---- forms & controls ---- */
+label{font-weight:500;letter-spacing:.01em}
+input,select{border-radius:var(--radius-sm);padding:9px 11px;min-height:40px;transition:border-color .15s,box-shadow .15s,background .15s}
+input:hover,select:hover{border-color:color-mix(in srgb,var(--mute) 55%,var(--line))}
+input:focus,select:focus{outline:none;border-color:var(--in);box-shadow:var(--ring)}
+input::placeholder{color:color-mix(in srgb,var(--mute) 75%,transparent)}
+input[type=checkbox]{accent-color:var(--in);min-height:0;width:17px;height:17px;cursor:pointer}
+select{cursor:pointer}
+.primary{border-radius:var(--radius-sm);padding:10px 18px;min-height:40px;font-weight:600;letter-spacing:.01em;
+  background:linear-gradient(180deg,color-mix(in srgb,var(--brand) 88%,var(--in)),var(--brand));
+  box-shadow:0 1px 2px rgba(0,0,0,.2);transition:transform .12s var(--ease),box-shadow .15s,filter .15s}
+.primary:hover{filter:brightness(1.12);box-shadow:var(--shadow-2)}
+.primary:active{transform:translateY(1px);box-shadow:none}
+.ghost{border-radius:var(--radius-sm);min-height:34px;transition:background .15s,border-color .15s,color .15s}
+.ghost:hover{border-color:var(--in);color:var(--in);background:color-mix(in srgb,var(--in) 8%,var(--bg))}
+.ghost.bad:hover{background:color-mix(in srgb,var(--out) 8%,var(--bg))}
+button{-webkit-tap-highlight-color:transparent}
+button:disabled,input:disabled{opacity:.55;cursor:not-allowed}
+:focus-visible{outline:2px solid var(--in);outline-offset:2px}
+.seg{border-radius:var(--radius-sm);box-shadow:var(--shadow-1)}
+.seg button{padding:10px;font-weight:500;transition:background .15s,color .15s}
+.err:not(:empty){background:color-mix(in srgb,var(--out) 10%,transparent);padding:7px 10px;border-radius:6px;border-left:3px solid var(--out)}
+.warn{border-radius:var(--radius-sm);border-left:4px solid var(--warn);padding:11px 14px}
+.note{line-height:1.5}
+
+/* ---- tables ---- */
+.tw{border-radius:var(--radius-sm)}
+table{font-size:14px}
+thead th{background:color-mix(in srgb,var(--mute) 7%,var(--panel));text-transform:uppercase;letter-spacing:.05em;font-size:11.5px;font-weight:600;
+  border-bottom:2px solid var(--line);padding:10px 8px}
+tbody tr{transition:background .12s}
+tbody tr:hover{background:color-mix(in srgb,var(--in) 5%,transparent)}
+tbody tr:last-child td{border-bottom:0}
+td{padding:10px 8px}
+.bd{font-weight:500;letter-spacing:.02em;text-transform:capitalize;padding:2px 10px;background:color-mix(in srgb,currentColor 8%,transparent)}
+.empty{padding:34px 20px;font-size:14px}
+.empty::before{content:"○";display:block;font-size:26px;opacity:.35;margin-bottom:6px}
+
+/* ---- Excel-like grids ---- */
+.gw{border-radius:var(--radius-sm);box-shadow:inset 0 0 0 1px var(--line)}
+.grid th{background:color-mix(in srgb,var(--brand) 6%,var(--panel));font-size:11.5px;text-transform:uppercase;letter-spacing:.04em;font-weight:600;white-space:nowrap}
+.grid tbody tr:nth-child(even) td{background:color-mix(in srgb,var(--mute) 4%,transparent)}
+.grid tbody tr:hover td{background:color-mix(in srgb,var(--in) 6%,transparent)}
+.grid tr.sel td{background:color-mix(in srgb,var(--in) 13%,transparent)!important}
+.grid td.bad,.grid tr.sel td.bad{background:color-mix(in srgb,var(--out) 16%,transparent)!important}
+.grid input.gc:focus,.grid input.rc:focus,.grid input.pc:focus,
+.grid select.gc:focus,.grid select.pc:focus{box-shadow:none;background:var(--panel)}
+.grid input.gc,.grid input.rc,.grid input.pc{min-height:38px}
+.grid td.gtot{background:color-mix(in srgb,var(--in) 6%,transparent)!important}
+.gtools{padding:10px;background:color-mix(in srgb,var(--mute) 6%,transparent);border-radius:var(--radius-sm);border:1px solid var(--line)}
+.gtools .primary{margin-left:auto}
+.mbar{padding:12px 14px;background:color-mix(in srgb,var(--in) 6%,transparent);border-radius:var(--radius-sm);border:1px solid var(--line)}
+#gtot,#brtot,#ptot{padding:10px 12px;background:color-mix(in srgb,var(--mute) 6%,transparent);border-radius:var(--radius-sm);line-height:1.8}
+.dirty{background:var(--warnbg);padding:1px 8px;border-radius:10px}
+
+/* ---- charts ---- */
+.pair i{transition:height .4s var(--ease);border-radius:4px 4px 0 0}
+.bars{border-bottom:1px solid var(--line)}
+
+/* ---- login ---- */
+.login{background:
+  radial-gradient(900px 500px at 15% 10%,color-mix(in srgb,var(--in) 22%,transparent),transparent 60%),
+  radial-gradient(800px 500px at 90% 90%,color-mix(in srgb,var(--brand) 30%,transparent),transparent 60%),var(--bg)}
+.login .card{padding:28px 26px;box-shadow:var(--shadow-2);border-radius:14px;gap:14px;animation:fadeUp .35s var(--ease)}
+.login h1{font-size:26px;letter-spacing:-.01em;display:flex;align-items:center;gap:10px}
+.login h1::before{content:"";width:34px;height:34px;border-radius:9px;background:linear-gradient(135deg,var(--in),#2dd4bf)}
+
+/* ---- dialogs & toast ---- */
+dialog{border-radius:14px;box-shadow:0 20px 60px rgba(0,0,0,.35);padding:22px;animation:pop .18s var(--ease)}
+dialog::backdrop{backdrop-filter:blur(3px);background:rgba(8,20,26,.55)}
+dialog h3{font-size:17px;margin-bottom:14px}
+@keyframes pop{from{opacity:0;transform:scale(.96) translateY(6px)}to{opacity:1;transform:none}}
+#toast{border-radius:10px;box-shadow:var(--shadow-2);padding:12px 18px;font-weight:500;border-left:4px solid #2dd4bf}
+#toast.bad{border-left-color:#fff}
+
+/* ---- mobile ---- */
+@media(max-width:820px){
+  header{padding:10px 14px}nav{top:auto;position:static}
+  main{padding:14px 10px 48px}
+  .kpi b{font-size:21px}
+  .gtools .primary{margin-left:0}
+  .login .card{padding:22px 18px}
+}
+@media(max-width:520px){
+  header .who{display:none}
+  input,select{font-size:16px} /* stops iOS zoom on focus */
+  .card{padding:12px}
+}
+
+/* ---- accessibility: honour reduced motion ---- */
+@media (prefers-reduced-motion:reduce){*,*::before,*::after{animation:none!important;transition:none!important;scroll-behavior:auto!important}}
+
+/* ---- print: clean paper output ---- */
+@media print{
+  header,nav,#toast,.gtools,.tools .ghost,dialog,[data-act]{display:none!important}
+  body{background:#fff;color:#000}
+  main{max-width:none!important;padding:0;animation:none}
+  .card,.kpi{box-shadow:none;border:1px solid #bbb;break-inside:avoid}
+  .gw,.tw{overflow:visible!important;max-height:none!important}
+  table.grid,table{min-width:0!important;font-size:10px}
+}
+
+</style>
+</head>
+<body>
+<div id="app"></div>
+<dialog id="dlg"><form id="dform"><h3 id="dt"></h3><div id="dbody"></div><div class="err" id="derr"></div><div class="drow"><button type="button" class="ghost" id="dcancel">Cancel</button><button class="primary" id="dok">OK</button></div></form></dialog>
+<div id="toast" role="status"></div>
+
+<script>
+/* ---------- constants ---------- */
+const KEY="cashbook.v2";
+const CURS=["SSP","USD"];
+const ROLES={field:"Field officer",cashier:"Cashier",accountant:"Accountant",manager:"Manager"};
+const CATS={in:["Sales","Customer payment","Field collection","Other income"],out:["Payroll","Rent & utilities","Supplies","Transport","Taxes & fees","Field expense","Other expense"]};
+const TYPES={cash:"Cash",bank:"Bank",mobile:"Mobile money"};
+const TABS={dash:["Dashboard",["cashier","accountant","manager"]],entries:["Entries",["field","cashier","accountant","manager"]],approvals:["Approvals",["cashier","accountant","manager"]],close:["Daily close",["cashier","accountant","manager"]],cargo:["Business Report book",["field","cashier","accountant","manager"]],bonds:["BONDS REGISTRY",["field","cashier","accountant","manager"]],pay:["PAYMENT RECORDS",["field","cashier","accountant","manager"]],data:["DATA",["field","cashier","accountant","manager"]],loans:["Loans",["accountant","manager"]],leave:["Leave",["field","cashier","accountant","manager"]],accounts:["Accounts",["manager"]],staff:["Staff",["manager"]],audit:["Audit log",["accountant","manager"]]};
+const DEFPIN={u1:"1111",u2:"2222",u3:"3333",u4:"4444"};
+
+/* ---------- helpers ---------- */
+const $=id=>document.getElementById(id);
+const pad=n=>String(n).padStart(2,"0");
+const iso=d=>d.getFullYear()+"-"+pad(d.getMonth()+1)+"-"+pad(d.getDate()); // local date, not UTC
+const ago=n=>{const d=new Date();d.setDate(d.getDate()-n);return iso(d)};
+const rd=n=>Math.round(n*100)/100;
+const fmt=(c,n)=>(n<0?"−":"")+c+" "+Math.abs(n).toLocaleString("en-US",{minimumFractionDigits:2,maximumFractionDigits:2});
+const esc=s=>String(s==null?"":s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const uid=()=>Math.random().toString(36).slice(2,9)+Date.now().toString(36);
+const hp=s=>{let a=0xdeadbeef,b=0x41c6ce57;s="cb|"+s;for(let i=0,c;i<s.length;i++){c=s.charCodeAt(i);a=Math.imul(a^c,2654435761);b=Math.imul(b^c,1597334677)}a=Math.imul(a^a>>>16,2246822507)^Math.imul(b^b>>>13,3266489909);b=Math.imul(b^b>>>16,2246822507)^Math.imul(a^a>>>13,3266489909);return(4294967296*(2097151&b)+(a>>>0)).toString(36)};
+const validPin=p=>/^\d{4,6}$/.test(p);
+function flash(m,bad){const t=$("toast");t.textContent=m;t.className="show"+(bad?" bad":"");clearTimeout(flash.t);flash.t=setTimeout(()=>t.className="",3500)}
+
+/* ---------- state ---------- */
+function seed(){
+  const A=[["a1","Cash – SSP","SSP","cash",["cashier"]],["a2","Cash – USD","USD","cash",["cashier"]],["a3","Bank – USD","USD","bank",[]],["a4","Mobile money – SSP","SSP","mobile",["cashier"]],["a5","Field float – SSP","SSP","cash",["field","cashier"]]]
+    .map(([id,name,cur,type,roles])=>({id,name,cur,type,roles,opening:0,active:true}));
+  const U=[["u1","Manager","manager"],["u2","Accountant","accountant"],["u3","Cashier","cashier"],["u4","Field Officer","field"]]
+    .map(([id,name,role])=>({id,name,role,pin:hp(DEFPIN[id]),active:true,dp:true}));
+  return{v:2,rate:5500,accounts:A,users:U,tx:[],closings:[],log:[],consignments:[],docs:[],monthCloses:[],loans:[],leaves:[]};
+}
+function load(){
+  try{const s=JSON.parse(localStorage.getItem(KEY));if(s&&Array.isArray(s.tx)&&s.users)return s}catch(e){}
+  const s=seed();
+  try{ // migrate the old single-user cashbook (it was in dollars) into Cash – USD
+    const o=JSON.parse(localStorage.getItem("cashbook.v1"));
+    if(o&&Array.isArray(o.tx)){
+      s.accounts[1].opening=Number(o.opening)||0;
+      s.tx=o.tx.map(x=>({id:"m"+x.id,d:x.d,acct:"a2",t:x.t,c:x.c,n:x.n,a:x.a,by:"u1",status:"posted",ts:x.d+"T12:00:00"}));
+      s.log.push({ts:new Date().toISOString(),by:"u1",a:"migrate",x:"Imported "+s.tx.length+" entries from the previous cashbook into Cash – USD"});
+    }
+  }catch(e){}
+  return s;
+}
+let st=load();
+st.consignments=st.consignments||[];st.docs=st.docs||[];st.monthCloses=st.monthCloses||[];st.loans=st.loans||[];st.leaves=st.leaves||[];st.bondsRegistry=st.bondsRegistry||[];st.businessReportBook=st.businessReportBook||[];st.reportCloses=st.reportCloses||[]; // tables added after v2: older saved data gets them empty
+if(st.consignments.some(x=>!x.d)){ // rows from the earlier column layout are archived (st.consignmentsOld), not deleted
+  st.consignmentsOld=(st.consignmentsOld||[]).concat(st.consignments.filter(x=>!x.d));st.consignments=st.consignments.filter(x=>x.d);save();
+}
+if(st.businessReportBook.some(x=>"arrival" in x)){ // the old Arrival (date) column became Manifest (SSP amount): keep the old date as arrivalOld, never lose it
+  st.businessReportBook.forEach(x=>{if("arrival" in x){x.arrivalOld=x.arrival;delete x.arrival;if(x.manifest===undefined)x.manifest=null}});save();
+}
+let sess=null;try{sess=sessionStorage.getItem("cb.s")}catch(e){}
+const ui={tab:"",type:"in",fail:0,until:0,cur:"",cacct:"",cd:"",exp:0};
+function save(){try{localStorage.setItem(KEY,JSON.stringify(st))}catch(e){}}
+function log(a,x,by){st.log.push({ts:new Date().toISOString(),by:by===undefined?sess:by,a,x:x||""});if(st.log.length>1500)st.log.splice(0,st.log.length-1500)}
+function commit(){save();render()}
+
+const me=()=>st.users.find(u=>u.id===sess&&u.active);
+const user=id=>st.users.find(u=>u.id===id);
+const uname=id=>(user(id)||{name:"—"}).name;
+const acct=id=>st.accounts.find(a=>a.id===id);
+const seesAll=u=>u.role==="manager"||u.role==="accountant";
+const canUse=(u,a)=>!!a&&a.active&&(seesAll(u)||a.roles.includes(u.role));
+const viewAccts=u=>st.accounts.filter(a=>seesAll(u)||a.roles.includes(u.role));
+const usableAccts=u=>st.accounts.filter(a=>canUse(u,a));
+
+/* ---------- ledger maths ---------- */
+const live=x=>x.status==="posted";
+const bal=(id,before)=>rd(acct(id).opening+st.tx.filter(x=>x.acct===id&&live(x)&&x.d<before).reduce((s,x)=>s+(x.t==="in"?x.a:-x.a),0));
+const dayT=(id,d)=>{let i=0,o=0;st.tx.forEach(x=>{if(x.acct===id&&live(x)&&x.d===d){x.t==="in"?i+=x.a:o+=x.a}});return{i:rd(i),o:rd(o)}};
+const closingOf=(id,d)=>st.closings.find(c=>c.acct===id&&c.d===d);
+const lockedThru=id=>st.closings.filter(c=>c.acct===id).reduce((m,c)=>c.d>m?c.d:m,"");
+const isLocked=(id,d)=>d<=lockedThru(id);
+const unclosed=(id,before)=>[...new Set(st.tx.filter(x=>x.acct===id&&(x.status==="posted"||x.status==="pending")&&x.d<before&&!closingOf(id,x.d)).map(x=>x.d))].sort();
+const pendingCount=()=>{const u=me();const ids=new Set(viewAccts(u).map(a=>a.id));return st.tx.filter(x=>x.status==="pending"&&ids.has(x.acct)).length};
+
+/* ---------- dialog ---------- */
+function ask(title,fields=[],ok="Confirm"){
+  return new Promise(res=>{
+    const d=$("dlg"),f=$("dform");
+    $("dt").textContent=title;$("derr").textContent="";$("dok").textContent=ok;
+    $("dbody").innerHTML=fields.map(x=>`<label>${esc(x.label)}<input name="${x.k}" type="${x.type||"text"}" ${x.attr||""} autocomplete="off"></label>`).join("");
+    const done=v=>{f.onsubmit=null;$("dcancel").onclick=null;d.oncancel=null;d.close();res(v)};
+    f.onsubmit=e=>{e.preventDefault();const v={};for(const x of fields){v[x.k]=f.elements[x.k].value.trim();if(x.req&&!v[x.k]){$("derr").textContent=x.label+" is required.";return}}done(v)};
+    $("dcancel").onclick=()=>done(null);
+    d.oncancel=e=>{e.preventDefault();done(null)};
+    d.showModal();
+    const first=f.elements[fields[0]&&fields[0].k];if(first)first.focus();
+  });
+}
+
+/* ---------- shell ---------- */
+function loginHTML(){
+  const dp=st.users.filter(u=>u.active&&u.dp&&DEFPIN[u.id]);
+  return`<div class="login"><div class="card"><h1>Cashbook</h1><div class="mute">Sign in with your staff PIN</div>
+  <form id="login"><label>Staff member<select id="lu">${st.users.filter(u=>u.active).map(u=>`<option value="${u.id}">${esc(u.name)} – ${ROLES[u.role]}</option>`).join("")}</select></label>
+  <label>PIN<input id="lp" type="password" inputmode="numeric" maxlength="6" autocomplete="off"></label>
+  <div class="err" id="err" role="alert"></div><button class="primary">Sign in</button></form>
+  ${dp.length?`<div class="warn">First-run PINs: ${dp.map(u=>esc(u.name)+" "+DEFPIN[u.id]).join(" · ")}. The manager should change them under Staff.</div>`:""}</div></div>`;
+}
+function render(){
+  const u=me();
+  if(!u){$("app").innerHTML=loginHTML();return}
+  const tabs=Object.entries(TABS).filter(([k,v])=>v[1].includes(u.role));
+  if(!tabs.some(([k])=>k===ui.tab))ui.tab=tabs[0][0];
+  const pc=TABS.approvals[1].includes(u.role)?pendingCount():0;
+  $("app").innerHTML=`<header><h1>Cashbook <small>${new Date().toLocaleDateString("en",{weekday:"long",day:"numeric",month:"long",year:"numeric"})}</small></h1>
+  <div class="hr"><span class="who">${esc(u.name)} · ${ROLES[u.role]}</span><button type="button" data-act="mypin">Change PIN</button><button type="button" data-act="theme">Theme</button><button type="button" data-act="logout">Sign out</button></div></header>
+  <nav>${tabs.map(([k,v])=>`<button type="button" data-act="tab" data-t="${k}" class="${k===ui.tab?"on":""}">${k==="entries"&&u.role==="field"?"My entries":v[0]}${k==="approvals"&&pc?`<b>${pc}</b>`:""}${k==="leave"&&pendingLeave(u)?`<b>${pendingLeave(u)}</b>`:""}</button>`).join("")}</nav><main id="main"></main>`;
+  views[ui.tab]();
+}
+const main=h=>{$("main").innerHTML=h};
+const badge=s=>`<span class="bd ${s}">${s}</span>`;
+
+/* ---------- views ---------- */
+const views={};
+
+views.dash=()=>{
+  const u=me(),A=viewAccts(u),today=ago(0),curs=CURS.filter(c=>A.some(a=>a.cur===c));
+  if(!A.length)return main(`<section class="card empty">No accounts are assigned to you yet.</section>`);
+  const rows=A.map(a=>{const o=bal(a.id,today),t=dayT(a.id,today);return{a,o,i:t.i,out:t.o,c:rd(o+t.i-t.o),cl:closingOf(a.id,today),late:unclosed(a.id,today)}});
+  const late=rows.filter(r=>r.late.length);
+  const kp=curs.map(c=>{const L=rows.filter(r=>r.a.cur===c),s=k=>rd(L.reduce((t,r)=>t+r[k],0));
+    return`<h2 class="cur">${c} · ALL ACCOUNTS</h2><section class="kpis"><div class="kpi"><span>Opening balance</span><b class="num">${fmt(c,s("o"))}</b></div><div class="kpi in"><span>Money in today</span><b class="num">${fmt(c,s("i"))}</b></div><div class="kpi out"><span>Money out today</span><b class="num">${fmt(c,s("out"))}</b></div><div class="kpi close"><span>Closing balance</span><b class="num">${fmt(c,s("c"))}</b></div></section>`}).join("");
+  const sspT=rd(rows.filter(r=>r.a.cur==="SSP").reduce((t,r)=>t+r.c,0)),usdT=rd(rows.filter(r=>r.a.cur==="USD").reduce((t,r)=>t+r.c,0));
+  const comb=curs.length===2?`<div class="note">Combined at the reference rate (1 USD = ${st.rate.toLocaleString("en-US")} SSP): <b class="num">${fmt("SSP",rd(sspT+usdT*st.rate))}</b></div>`:"";
+  const bc=curs.includes(ui.cur)?ui.cur:curs[0];
+  const days=[6,5,4,3,2,1,0].map(n=>{const d=ago(n);let i=0,o=0;A.filter(a=>a.cur===bc).forEach(a=>{const t=dayT(a.id,d);i+=t.i;o+=t.o});return{d,i,o}});
+  const mx=Math.max(1,...days.flatMap(x=>[x.i,x.o]));
+  main(`${late.length?`<div class="warn">Days not yet closed: ${late.map(r=>`${esc(r.a.name)} (${r.late.length})`).join(", ")}. Go to <b>Daily close</b>.</div>`:""}
+  ${kp}${comb}
+  <section class="card"><h2>Accounts today</h2><div class="tw"><table><thead><tr><th>Account</th><th>Type</th><th class="r">Opening</th><th class="r">In</th><th class="r">Out</th><th class="r">Closing</th><th>Status</th></tr></thead><tbody>
+  ${rows.map(r=>`<tr><td>${esc(r.a.name)}${r.a.active?"":' <span class="mute">(inactive)</span>'}</td><td>${TYPES[r.a.type]}</td><td class="r num">${fmt(r.a.cur,r.o)}</td><td class="r num in-t">${fmt(r.a.cur,r.i)}</td><td class="r num out-t">${fmt(r.a.cur,r.out)}</td><td class="r num">${fmt(r.a.cur,r.c)}</td><td>${r.cl?badge(r.cl.status):r.late.length?`<span class="bd rejected">${r.late.length} day(s) unclosed</span>`:'<span class="bd">open</span>'}</td></tr>`).join("")}</tbody></table></div></section>
+  <section class="card"><div class="tools" style="justify-content:space-between"><h2 style="margin:0">Last 7 days</h2>${curs.length>1?`<select id="bc" aria-label="Currency">${curs.map(c=>`<option ${c===bc?"selected":""}>${c}</option>`).join("")}</select>`:`<span class="mute">${bc}</span>`}</div>
+  <div class="bars">${days.map(x=>`<div class="day" title="${x.d}: in ${fmt(bc,x.i)}, out ${fmt(bc,x.o)}"><div class="pair"><i class="a" style="height:${x.i/mx*100}%"></i><i class="b" style="height:${x.o/mx*100}%"></i></div>${new Date(x.d+"T00:00").toLocaleDateString("en",{weekday:"short"})}</div>`).join("")}</div>
+  <div class="legend"><span><s style="background:var(--in)"></s>In</span><span><s style="background:var(--out)"></s>Out</span></div></section>`);
+};
+
+function fillCats(){const c=$("cat");if(c)c.innerHTML=CATS[ui.type].map(x=>`<option>${x}</option>`).join("")}
+function curLabel(){const a=acct($("acct")&&$("acct").value);const l=$("curl");if(l&&a)l.textContent=a.cur}
+function xCalc(){
+  const f=acct($("xf")&&$("xf").value),t=acct($("xt")&&$("xt").value);if(!f||!t)return null;
+  const a=rd(parseFloat($("xa").value)||0),r=parseFloat($("xr").value)||st.rate,same=f.cur===t.cur;
+  $("xrw").hidden=same;
+  const got=same?a:f.cur==="USD"?rd(a*r):rd(a/r);
+  $("xp").textContent=a>0?`${f.name} −${fmt(f.cur,a)}  →  ${t.name} +${fmt(t.cur,got)}`:"";
+  return{f,t,a,got,same,r};
+}
+function filtered(){
+  const u=me(),vis=new Set(viewAccts(u).map(a=>a.id)),today=ago(0),w=ago(6),m=today.slice(0,7);
+  const q=$("q").value.toLowerCase(),fs=$("fs").value,fa=$("fa").value,fd=$("fd").value;
+  return st.tx.filter(x=>vis.has(x.acct)&&(u.role!=="field"||x.by===u.id)&&(!fs||x.status===fs)&&(!fa||x.acct===fa)&&(!q||(x.n+x.c+uname(x.by)+acct(x.acct).name).toLowerCase().includes(q))&&(!fd||(fd==="today"?x.d===today:fd==="week"?x.d>=w:x.d.startsWith(m)))).sort((a,b)=>b.d.localeCompare(a.d)||b.ts.localeCompare(a.ts));
+}
+function canVoid(x){
+  const u=me(),a=acct(x.acct);
+  if(x.status==="void"||x.status==="rejected"||x.adj||isLocked(x.acct,x.d))return false;
+  if(u.role==="field")return x.by===u.id&&x.status==="pending";
+  return canUse(u,a);
+}
+function renderLedger(){
+  const u=me(),L=filtered();
+  const tot=CURS.map(c=>{let i=0,o=0;L.forEach(x=>{if(live(x)&&acct(x.acct).cur===c){x.t==="in"?i+=x.a:o+=x.a}});return(i||o)?`${c}: <span class="in-t">+${fmt(c,rd(i)).slice(4)}</span> / <span class="out-t">−${fmt(c,rd(o)).slice(4)}</span>`:""}).filter(Boolean).join(" · ");
+  $("rows").innerHTML=L.slice(0,300).map(x=>{const a=acct(x.acct);return`<tr><td class="num">${x.d}</td><td>${esc(a.name)}</td><td>${esc(x.c)}</td><td class="wrap">${esc(x.n)}</td><td>${esc(uname(x.by))}</td><td>${badge(x.status)}</td><td class="r num ${x.t}-t">${x.t==="in"?"+":"−"}${fmt(a.cur,x.a).slice(a.cur.length+1)} <span class="mute">${a.cur}</span></td><td>${canVoid(x)?`<button class="ghost bad" type="button" data-act="void" data-id="${x.id}">Void</button>`:""}</td></tr>`}).join("");
+  $("empty").hidden=L.length>0;
+  $("tot").innerHTML=L.length?`Posted totals in this view — ${tot||"none"}`:"";
+}
+views.entries=()=>{
+  const u=me(),usable=usableAccts(u),vis=viewAccts(u),opt=usable.map(a=>`<option value="${a.id}">${esc(a.name)} (${a.cur})</option>`).join("");
+  const xfer=u.role!=="field"&&usable.length>1?`<section class="card"><h2>Transfer / currency exchange</h2><form id="x" novalidate>
+    <label>From<select id="xf">${opt}</select></label><label>To<select id="xt">${usable.map((a,i)=>`<option value="${a.id}" ${i===1?"selected":""}>${esc(a.name)} (${a.cur})</option>`).join("")}</select></label>
+    <label>Amount sent (from-account currency)<input id="xa" type="number" min="0.01" step="0.01" inputmode="decimal"></label>
+    <label id="xrw" hidden>Rate (SSP per 1 USD)<input id="xr" type="number" min="0.0001" step="any" value="${st.rate}"></label>
+    <div class="note num" id="xp"></div><div class="err" id="xerr" role="alert"></div><button class="primary" type="submit">Post transfer (today)</button></form></section>`:"";
+  main(`<div class="cols"><div class="stack"><section class="card"><h2>Record a transaction</h2>
+  ${usable.length?`<form id="f" novalidate>
+    <div class="seg" role="group" aria-label="Type"><button type="button" data-act="type" data-t="in" class="${ui.type==="in"?"on in":""}">Money in</button><button type="button" data-act="type" data-t="out" class="${ui.type==="out"?"on out":""}">Money out</button></div>
+    <label>Account<select id="acct">${opt}</select></label>
+    <label>Date<input type="date" id="date" max="${ago(0)}" value="${ago(0)}" required></label>
+    <label>Category<select id="cat"></select></label>
+    <label>Description<input id="desc" maxlength="80" placeholder="e.g. Invoice #1042 – Delta Traders"></label>
+    <label>Amount (<span id="curl"></span>)<input id="amt" type="number" min="0.01" step="0.01" inputmode="decimal" placeholder="0.00"></label>
+    ${u.role==="field"?`<div class="note">Your entries stay <b>pending</b> until a cashier or accountant approves them.</div>`:""}
+    <div class="err" id="err" role="alert"></div><button class="primary" type="submit">${u.role==="field"?"Submit for approval":"Save entry"}</button></form>`:`<div class="empty">No accounts are assigned to you. Ask a manager.</div>`}</section>${xfer}</div>
+  <section class="card"><h2>${u.role==="field"?"My entries":"Ledger"}</h2><div class="tools">
+    <input id="q" type="search" placeholder="Search" aria-label="Search">
+    <select id="fs" aria-label="Status"><option value="">Any status</option><option>posted</option><option>pending</option><option>rejected</option><option>void</option></select>
+    <select id="fa" aria-label="Account"><option value="">All accounts</option>${vis.map(a=>`<option value="${a.id}">${esc(a.name)}</option>`).join("")}</select>
+    <select id="fd" aria-label="Period"><option value="">All dates</option><option value="today">Today</option><option value="week">Last 7 days</option><option value="month">This month</option></select>
+    ${seesAll(u)?`<button class="ghost" type="button" data-act="csv">Export CSV</button>`:""}</div>
+  <div class="tw"><table><thead><tr><th>Date</th><th>Account</th><th>Category</th><th>Description</th><th>By</th><th>Status</th><th class="r">Amount</th><th></th></tr></thead><tbody id="rows"></tbody></table></div>
+  <div class="empty" id="empty" hidden>No entries match.</div><div class="note" id="tot" style="margin-top:8px"></div></section></div>`);
+  fillCats();curLabel();renderLedger();if($("xf"))xCalc();
+};
+
+views.approvals=()=>{
+  const u=me(),ids=new Set(viewAccts(u).map(a=>a.id));
+  const L=st.tx.filter(x=>x.status==="pending"&&ids.has(x.acct)).sort((a,b)=>a.d.localeCompare(b.d));
+  main(`<section class="card"><h2>Pending approval (${L.length})</h2>${L.length?`<div class="tw"><table><thead><tr><th>Date</th><th>Account</th><th>Category</th><th>Description</th><th>Submitted by</th><th class="r">Amount</th><th></th></tr></thead><tbody>
+  ${L.map(x=>{const a=acct(x.acct);return`<tr><td class="num">${x.d}</td><td>${esc(a.name)}</td><td>${esc(x.c)}</td><td class="wrap">${esc(x.n)}</td><td>${esc(uname(x.by))}</td><td class="r num ${x.t}-t">${x.t==="in"?"+":"−"}${fmt(a.cur,x.a).slice(a.cur.length+1)} ${a.cur}</td><td>${canUse(u,a)?`<button class="ghost" type="button" data-act="approve" data-id="${x.id}">Approve</button> <button class="ghost bad" type="button" data-act="reject" data-id="${x.id}">Reject</button>`:""}</td></tr>`}).join("")}</tbody></table></div>`:`<div class="empty">Nothing waiting for approval.</div>`}</section>`);
+};
+
+views.close=()=>{
+  const u=me(),usable=usableAccts(u),today=ago(0);
+  if(!usable.length)return main(`<section class="card empty">No accounts are assigned to you.</section>`);
+  let a=acct(ui.cacct);if(!a||!canUse(u,a))a=usable[0];ui.cacct=a.id;
+  const d=ui.cd&&ui.cd<=today?ui.cd:today;ui.cd=d;
+  const o=bal(a.id,d),t=dayT(a.id,d),exp=rd(o+t.i-t.o),cl=closingOf(a.id,d);ui.exp=exp;
+  const pend=st.tx.filter(x=>x.acct===a.id&&x.d===d&&x.status==="pending").length,prior=unclosed(a.id,d);
+  const chips=usable.flatMap(x=>unclosed(x.id,"9999-12-31").map(dt=>[x,dt]));
+  let body;
+  if(cl)body=`<div class="sum"><span>Counted / statement</span><b class="num">${fmt(a.cur,cl.counted)}</b><span>Variance</span><b class="num ${cl.v<0?"out-t":cl.v>0?"in-t":""}">${fmt(a.cur,cl.v)}</b><span>Closed by</span><b>${esc(uname(cl.by))}</b><span>Status</span><b>${badge(cl.status)}</b></div>${cl.note?`<div class="note">Note: ${esc(cl.note)}</div>`:""}`;
+  else if(isLocked(a.id,d))body=`<div class="note">A later day is already closed for this account, and nothing was recorded on this date.</div>`;
+  else if(prior.length)body=`<div class="warn">Close earlier days first: ${prior.join(", ")}.</div>`;
+  else if(pend)body=`<div class="warn">${pend} entr${pend>1?"ies are":"y is"} still pending approval for this day. Approve or reject ${pend>1?"them":"it"} before closing.</div>`;
+  else body=`<form id="cl" novalidate><label>${a.type==="cash"?"Cash counted":"Statement / app balance"} (${a.cur})<input id="cnt" type="number" min="0" step="0.01" inputmode="decimal" placeholder="0.00"></label>
+    <div class="note num" id="cv"></div><label>Note (required if there is a variance)<input id="cnote" maxlength="120"></label><div class="err" id="err" role="alert"></div><button class="primary" type="submit">Close day</button></form>`;
+  const H=st.closings.filter(c=>viewAccts(u).some(x=>x.id===c.acct)).sort((x,y)=>y.d.localeCompare(x.d)||y.ts.localeCompare(x.ts)).slice(0,60);
+  main(`<div class="cols"><section class="card"><h2>Close the day</h2>
+    ${chips.length?`<div class="note" style="margin-bottom:8px">Needs closing:</div><div class="chips" style="margin-bottom:12px">${chips.map(([x,dt])=>`<button class="ghost" type="button" data-act="pick" data-a="${x.id}" data-d="${dt}">${esc(x.name)} · ${dt}</button>`).join("")}</div>`:""}
+    <div style="display:grid;gap:10px"><label>Account<select id="cacct">${usable.map(x=>`<option value="${x.id}" ${x.id===a.id?"selected":""}>${esc(x.name)} (${x.cur})</option>`).join("")}</select></label>
+    <label>Date<input type="date" id="cd" max="${today}" value="${d}"></label>
+    <div class="sum"><span>Opening</span><b class="num">${fmt(a.cur,o)}</b><span>Money in</span><b class="num in-t">${fmt(a.cur,t.i)}</b><span>Money out</span><b class="num out-t">${fmt(a.cur,t.o)}</b><span>Expected closing</span><b class="num">${fmt(a.cur,exp)}</b></div>${body}</div></section>
+  <section class="card"><h2>Closings &amp; reconciliation</h2>${H.length?`<div class="tw"><table><thead><tr><th>Date</th><th>Account</th><th class="r">Expected</th><th class="r">Counted</th><th class="r">Variance</th><th>Closed by</th><th>Status</th><th></th></tr></thead><tbody>
+  ${H.map(c=>{const x=acct(c.acct);const canRec=c.status==="closed"&&seesAll(u)&&(c.by!==u.id||u.role==="manager");const canRe=u.role==="manager"&&c.d===lockedThru(c.acct);
+    return`<tr><td class="num">${c.d}</td><td>${esc(x.name)}</td><td class="r num">${fmt(x.cur,c.exp)}</td><td class="r num">${fmt(x.cur,c.counted)}</td><td class="r num ${c.v<0?"out-t":c.v>0?"in-t":""}">${fmt(x.cur,c.v)}</td><td>${esc(uname(c.by))}</td><td>${badge(c.status)}${c.rby?`<div class="note">by ${esc(uname(c.rby))}</div>`:""}</td><td>${canRec?`<button class="ghost" type="button" data-act="rec" data-id="${c.id}">Reconcile</button> `:""}${canRe?`<button class="ghost bad" type="button" data-act="reopen" data-id="${c.id}">Reopen</button>`:""}</td></tr>`}).join("")}</tbody></table></div>
+  <div class="note" style="margin-top:8px">The person who closes a day cannot reconcile it (managers excepted). A variance is posted as a "Cash over/short" entry so the books match the count.</div>`:`<div class="empty">No days closed yet.</div>`}</section></div>`);
+  const c=$("cnt");if(c)c.focus();
+};
+
+views.accounts=()=>{
+  const used=a=>st.tx.some(x=>x.acct===a.id)||st.closings.some(c=>c.acct===a.id);
+  main(`<section class="card"><h2>Accounts</h2><div class="tw"><table><thead><tr><th>Name</th><th>Currency</th><th>Type</th><th class="r">Opening balance</th><th class="r">Balance now</th><th>Field officers</th><th>Cashiers</th><th>Active</th></tr></thead><tbody>
+  ${st.accounts.map(a=>`<tr><td>${esc(a.name)}</td><td>${a.cur}</td><td>${TYPES[a.type]}</td>
+  <td class="r">${used(a)?`<span class="num">${fmt(a.cur,a.opening)}</span>`:`<input style="width:140px;text-align:right" class="num" type="number" step="0.01" value="${a.opening}" data-chg="open" data-a="${a.id}" aria-label="Opening balance">`}</td>
+  <td class="r num">${fmt(a.cur,bal(a.id,"9999-12-31"))}</td>
+  <td><input type="checkbox" data-chg="role" data-a="${a.id}" data-r="field" ${a.roles.includes("field")?"checked":""} aria-label="Field officers"></td>
+  <td><input type="checkbox" data-chg="role" data-a="${a.id}" data-r="cashier" ${a.roles.includes("cashier")?"checked":""} aria-label="Cashiers"></td>
+  <td><input type="checkbox" data-chg="active" data-a="${a.id}" ${a.active?"checked":""} aria-label="Active"></td></tr>`).join("")}</tbody></table></div>
+  <div class="note" style="margin-top:8px">Accountants and managers can use every active account. Opening balance can be edited until the account has entries.</div></section>
+  <div class="cols"><section class="card"><h2>Add account</h2><form id="na"><label>Name<input id="nan" maxlength="40" placeholder="e.g. Cash – Juba office"></label>
+  <label>Currency<select id="nac">${CURS.map(c=>`<option>${c}</option>`).join("")}</select></label><label>Type<select id="nat">${Object.entries(TYPES).map(([k,v])=>`<option value="${k}">${v}</option>`).join("")}</select></label>
+  <label>Opening balance<input id="nao" type="number" step="0.01" value="0"></label>
+  <label class="chk"><input type="checkbox" id="naf">Field officers can use it</label><label class="chk"><input type="checkbox" id="nak" checked>Cashiers can use it</label>
+  <div class="err" id="err" role="alert"></div><button class="primary">Add account</button></form></section>
+  <section class="card"><h2>Reference exchange rate</h2><label>SSP per 1 USD<input type="number" min="0.0001" step="any" value="${st.rate}" data-chg="rate"></label>
+  <div class="note" style="margin-top:8px">Used as the default for exchanges and for the combined total on the dashboard. Update it whenever your working rate changes; each exchange can still use its own rate.</div></section></div>`);
+};
+
+views.staff=()=>{
+  main(`<section class="card"><h2>Staff</h2><div class="tw"><table><thead><tr><th>Name</th><th>Role</th><th>Authority</th><th>Status</th><th></th></tr></thead><tbody>
+  ${st.users.map(u=>`<tr><td>${esc(u.name)}${u.id===sess?' <span class="mute">(you)</span>':""}${u.dp?' <span class="bd pending">default PIN</span>':""}</td>
+  <td><select data-chg="urole" data-u="${u.id}" style="width:auto">${Object.entries(ROLES).map(([k,v])=>`<option value="${k}" ${k===u.role?"selected":""}>${v}</option>`).join("")}</select></td>
+  <td>${u.role==="manager"?'<span class="mute">All (manager)</span>':`<label class="chk" style="font-size:13px"><input type="checkbox" data-chg="uperm" data-u="${u.id}" data-p="close" ${u.close?"checked":""}>Close month</label><label class="chk" style="font-size:13px"><input type="checkbox" data-chg="uperm" data-u="${u.id}" data-p="leave" ${u.leave?"checked":""}>Approve leave</label>`}</td>
+  <td>${u.active?badge("posted").replace("posted","active"):badge("void").replace("void","inactive")}</td>
+  <td><button class="ghost" type="button" data-act="pin" data-id="${u.id}">Reset PIN</button> <button class="ghost ${u.active?"bad":""}" type="button" data-act="ustat" data-id="${u.id}">${u.active?"Deactivate":"Activate"}</button></td></tr>`).join("")}</tbody></table></div></section>
+  <section class="card"><h2>Add staff member</h2><form id="nu" style="max-width:380px"><label>Name<input id="nun" maxlength="40"></label>
+  <label>Role<select id="nur">${Object.entries(ROLES).map(([k,v])=>`<option value="${k}">${v}</option>`).join("")}</select></label>
+  <label>PIN (4–6 digits)<input id="nup" type="password" inputmode="numeric" maxlength="6" autocomplete="off"></label>
+  <div class="err" id="err" role="alert"></div><button class="primary">Add staff</button></form></section>
+  <section class="card"><h2>What each role can do</h2><div class="sum" style="grid-template-columns:130px 1fr">
+  <span>Field officer</span><b style="text-align:left">Records collections and expenses on assigned accounts; entries wait for approval. Sees only their own entries.</b>
+  <span>Cashier</span><b style="text-align:left">Records entries, transfers and exchanges on assigned accounts, approves field entries, closes the day.</b>
+  <span>Accountant</span><b style="text-align:left">Works on every account, approves entries, reconciles closed days, reads the audit log and exports CSV.</b>
+  <span>Manager</span><b style="text-align:left">Everything above, plus staff, accounts, exchange rate, reopening a closed day, closing and reopening a month, and approving leave. Can give any staff member the right to close a month or approve leave (Authority column).</b></div></section>`);
+};
+
+views.audit=()=>{
+  main(`<section class="card"><h2>Audit log</h2><div class="tools"><input id="aq" type="search" placeholder="Search who / what" aria-label="Search"></div>
+  <div class="tw"><table><thead><tr><th>When</th><th>Who</th><th>Action</th><th>Detail</th></tr></thead><tbody id="arows"></tbody></table></div></section>`);
+  renderAudit();
+};
+function renderAudit(){
+  const q=($("aq").value||"").toLowerCase();
+  $("arows").innerHTML=st.log.slice().reverse().filter(l=>!q||(uname(l.by)+l.a+l.x).toLowerCase().includes(q)).slice(0,300)
+    .map(l=>`<tr><td class="num">${new Date(l.ts).toLocaleString("en-GB",{hour12:false}).replace(",","")}</td><td>${esc(uname(l.by))}</td><td>${esc(l.a)}</td><td class="wrap">${esc(l.x)}</td></tr>`).join("");
+}
+
+/* ---------- actions ---------- */
+const acts={
+  tab:b=>{ui.tab=b.dataset.t;render()},
+  theme:()=>{const r=document.documentElement;const dark=getComputedStyle(r).getPropertyValue("--bg").trim()==="#0e171b";r.dataset.theme=dark?"light":"dark"},
+  logout:()=>{log("logout");save();sess=null;ui.g=null;try{sessionStorage.removeItem("cb.s")}catch(e){}render()},
+  type:b=>{ui.type=b.dataset.t;document.querySelectorAll(".seg button").forEach(x=>x.className=x===b?"on "+ui.type:"");fillCats()},
+  mypin:async()=>{
+    const u=me(),v=await ask("Change your PIN",[{k:"o",label:"Current PIN",type:"password",req:1,attr:'inputmode="numeric" maxlength="6"'},{k:"n",label:"New PIN (4–6 digits)",type:"password",req:1,attr:'inputmode="numeric" maxlength="6"'}],"Change PIN");
+    if(!v)return;if(u.pin!==hp(v.o))return flash("Current PIN is wrong.",1);if(!validPin(v.n))return flash("PIN must be 4–6 digits.",1);
+    u.pin=hp(v.n);u.dp=false;log("pin.change","");save();flash("PIN changed.");render();
+  },
+  pin:async b=>{
+    const t=user(b.dataset.id),v=await ask("New PIN for "+t.name,[{k:"n",label:"New PIN (4–6 digits)",type:"password",req:1,attr:'inputmode="numeric" maxlength="6"'}],"Reset PIN");
+    if(!v)return;if(!validPin(v.n))return flash("PIN must be 4–6 digits.",1);
+    t.pin=hp(v.n);t.dp=false;log("pin.reset",t.name);save();flash("PIN reset.");render();
+  },
+  ustat:b=>{
+    const t=user(b.dataset.id),mg=st.users.filter(u=>u.active&&u.role==="manager");
+    if(t.active&&t.id===sess)return flash("You cannot deactivate yourself.",1);
+    if(t.active&&t.role==="manager"&&mg.length<2)return flash("Keep at least one active manager.",1);
+    t.active=!t.active;log(t.active?"staff.activate":"staff.deactivate",t.name);commit();
+  },
+  void:async b=>{
+    const x=st.tx.find(t=>t.id===b.dataset.id);if(!x||!canVoid(x))return;
+    const legs=x.g?st.tx.filter(t=>t.g===x.g):[x];
+    if(legs.some(t=>isLocked(t.acct,t.d)))return flash("One side of this transfer is on a closed day.",1);
+    const v=await ask(legs.length>1?"Void transfer (both sides)":"Void entry",[{k:"r",label:"Reason",req:1,attr:'maxlength="100"'}],"Void");if(!v)return;
+    legs.forEach(t=>{t.status="void";t.reason=v.r});
+    log("entry.void",`${fmt(acct(x.acct).cur,x.a)} ${x.n} – ${v.r}`);commit();
+  },
+  approve:b=>{
+    const x=st.tx.find(t=>t.id===b.dataset.id),u=me();if(!x||x.status!=="pending"||!canUse(u,acct(x.acct)))return;
+    if(isLocked(x.acct,x.d))return flash("That day is already closed.",1);
+    x.status="posted";x.appr=u.id;log("entry.approve",`${fmt(acct(x.acct).cur,x.a)} ${x.n} (by ${uname(x.by)})`);flash("Approved.");commit();
+  },
+  reject:async b=>{
+    const x=st.tx.find(t=>t.id===b.dataset.id),u=me();if(!x||x.status!=="pending"||!canUse(u,acct(x.acct)))return;
+    const v=await ask("Reject entry",[{k:"r",label:"Reason",req:1,attr:'maxlength="100"'}],"Reject");if(!v)return;
+    x.status="rejected";x.reason=v.r;x.appr=u.id;log("entry.reject",`${x.n} – ${v.r}`);commit();
+  },
+  csv:()=>{
+    const L=filtered();
+    csv("cashbook-ledger.csv",[["Date","Account","Currency","Type","Category","Description","Amount","Status","Entered by","Approved by","Time"],...L.map(x=>{const a=acct(x.acct);return[x.d,a.name,a.cur,x.t,x.c,x.n,x.a,x.status,uname(x.by),x.appr?uname(x.appr):"",x.ts]})]);
+  },
+  pick:b=>{ui.cacct=b.dataset.a;ui.cd=b.dataset.d;views.close()},
+  rec:async b=>{
+    const c=st.closings.find(x=>x.id===b.dataset.id),u=me();if(!c||c.status!=="closed")return;
+    if(c.by===u.id&&u.role!=="manager")return flash("Someone else must reconcile your closing.",1);
+    const v=await ask("Reconcile "+acct(c.acct).name+" · "+c.d,[{k:"n",label:"Note (optional)",attr:'maxlength="120"'}],"Reconcile");if(!v)return;
+    c.status="reconciled";c.rby=u.id;c.rts=new Date().toISOString();if(v.n)c.rnote=v.n;
+    log("close.reconcile",`${acct(c.acct).name} ${c.d} variance ${fmt(acct(c.acct).cur,c.v)}`);flash("Reconciled.");commit();
+  },
+  reopen:async b=>{
+    const c=st.closings.find(x=>x.id===b.dataset.id);if(!c)return;
+    if(c.d!==lockedThru(c.acct))return flash("Reopen the most recent closed day first.",1);
+    const v=await ask("Reopen "+acct(c.acct).name+" · "+c.d,[{k:"r",label:"Reason",req:1,attr:'maxlength="100"'}],"Reopen");if(!v)return;
+    st.tx=st.tx.filter(x=>x.close!==c.id);st.closings=st.closings.filter(x=>x.id!==c.id);
+    log("close.reopen",`${acct(c.acct).name} ${c.d} – ${v.r}`);commit();
+  }
+};
+function csv(name,rows){
+  const q=v=>{let s=String(v);if(/^[=+\-@\t\r]/.test(s)&&isNaN(Number(s)))s="'"+s;return`"${s.replace(/"/g,'""')}"`};
+  const url=URL.createObjectURL(new Blob(["\ufeff"+rows.map(r=>r.map(q).join(",")).join("\n")],{type:"text/csv"}));
+  const a=document.createElement("a");a.href=url;a.download=name;a.click();setTimeout(()=>URL.revokeObjectURL(url),1000);
+}
+
+/* ---------- forms ---------- */
+const forms={
+  login:()=>{
+    const err=m=>{$("err").textContent=m};
+    if(Date.now()<ui.until)return err(`Too many attempts. Wait ${Math.ceil((ui.until-Date.now())/1000)}s.`);
+    const u=user($("lu").value);
+    if(u&&u.active&&u.pin===hp($("lp").value)){
+      ui.fail=0;sess=u.id;try{sessionStorage.setItem("cb.s",sess)}catch(e){}
+      log("login","");save();ui.tab="";render();
+    }else{
+      ui.fail++;if(ui.fail>=5){ui.until=Date.now()+30000;ui.fail=0}
+      log("login.failed",u?u.name:"",u?u.id:null);save();err("Wrong PIN.");$("lp").value="";
+    }
+  },
+  f:()=>{
+    const u=me(),a=acct($("acct").value),d=$("date").value,n=$("desc").value.trim(),amt=rd(parseFloat($("amt").value));
+    const err=m=>{$("err").textContent=m};
+    if(!a||!canUse(u,a))return err("Choose an account.");
+    if(!d||d>ago(0))return err("Choose a valid date (not in the future).");
+    if(isLocked(a.id,d))return err(`${a.name} is closed through ${lockedThru(a.id)}. Use a later date.`);
+    if(!(amt>0))return err("Enter an amount greater than zero.");
+    if(!n)return err("Add a short description.");
+    const x={id:uid(),d,acct:a.id,t:ui.type,c:$("cat").value,n,a:amt,by:u.id,status:u.role==="field"?"pending":"posted",ts:new Date().toISOString()};
+    st.tx.push(x);log("entry."+x.status,`${x.t} ${fmt(a.cur,amt)} · ${a.name} · ${n}`);
+    flash(x.status==="pending"?"Submitted for approval.":"Entry saved.");commit();
+  },
+  x:()=>{
+    const u=me(),k=xCalc(),err=m=>{$("xerr").textContent=m},d=ago(0);
+    if(!k)return err("Choose both accounts.");
+    if(k.f.id===k.t.id)return err("Choose two different accounts.");
+    if(!canUse(u,k.f)||!canUse(u,k.t))return err("You cannot use one of these accounts.");
+    if(!(k.a>0))return err("Enter an amount.");
+    if(!k.same&&!(k.r>0))return err("Enter a valid rate.");
+    if(!(k.got>0))return err("Amount is too small to convert.");
+    for(const a of [k.f,k.t])if(isLocked(a.id,d))return err(`${a.name} is already closed for today.`);
+    const g=uid(),ts=new Date().toISOString(),c=k.same?"Transfer":"Currency exchange",note=k.same?"":` @ ${k.r.toLocaleString("en-US")} SSP/USD`;
+    st.tx.push({id:uid(),g,d,acct:k.f.id,t:"out",c,n:`To ${k.t.name}${note}`,a:k.a,by:u.id,status:"posted",ts});
+    st.tx.push({id:uid(),g,d,acct:k.t.id,t:"in",c,n:`From ${k.f.name}${note}`,a:k.got,by:u.id,status:"posted",ts});
+    log("transfer",`${fmt(k.f.cur,k.a)} ${k.f.name} → ${fmt(k.t.cur,k.got)} ${k.t.name}`);flash("Transfer posted.");commit();
+  },
+  cl:()=>{
+    const u=me(),a=acct(ui.cacct),d=ui.cd,err=m=>{$("err").textContent=m};
+    if(!canUse(u,a)||u.role==="field")return err("You cannot close this account.");
+    if(closingOf(a.id,d)||isLocked(a.id,d))return err("This day is already closed.");
+    if(unclosed(a.id,d).length)return err("Close earlier days first.");
+    if(st.tx.some(x=>x.acct===a.id&&x.d===d&&x.status==="pending"))return err("Resolve pending entries first.");
+    const cnt=parseFloat($("cnt").value);if(!isFinite(cnt)||cnt<0)return err("Enter the counted amount.");
+    const exp=rd(bal(a.id,d)+dayT(a.id,d).i-dayT(a.id,d).o),counted=rd(cnt),v=rd(counted-exp),note=$("cnote").value.trim();
+    if(v!==0&&!note)return err("Explain the variance in the note.");
+    const ts=new Date().toISOString(),cl={id:uid(),acct:a.id,d,exp,counted,v,note,by:u.id,ts,status:"closed"};
+    if(v!==0)st.tx.push({id:uid(),d,acct:a.id,t:v>0?"in":"out",c:"Cash over/short",n:`Closing adjustment (${v>0?"over":"short"})`,a:Math.abs(v),by:u.id,status:"posted",ts,adj:1,close:cl.id});
+    st.closings.push(cl);log("close",`${a.name} ${d}: expected ${fmt(a.cur,exp)}, counted ${fmt(a.cur,counted)}, variance ${fmt(a.cur,v)}`);
+    flash(v===0?"Day closed — no variance.":"Day closed with a variance.");commit();
+  },
+  na:()=>{
+    const err=m=>{$("err").textContent=m},n=$("nan").value.trim(),o=rd(parseFloat($("nao").value)||0);
+    if(!n)return err("Enter a name.");
+    if(st.accounts.some(a=>a.name.toLowerCase()===n.toLowerCase()))return err("An account with that name exists.");
+    const roles=[];if($("naf").checked)roles.push("field");if($("nak").checked)roles.push("cashier");
+    st.accounts.push({id:"a"+uid(),name:n,cur:$("nac").value,type:$("nat").value,roles,opening:o,active:true});
+    log("account.add",`${n} (${$("nac").value})`);flash("Account added.");commit();
+  },
+  nu:()=>{
+    const err=m=>{$("err").textContent=m},n=$("nun").value.trim(),p=$("nup").value;
+    if(!n)return err("Enter a name.");if(!validPin(p))return err("PIN must be 4–6 digits.");
+    if(st.users.some(u=>u.name.toLowerCase()===n.toLowerCase()))return err("That name is already used.");
+    st.users.push({id:"u"+uid(),name:n,role:$("nur").value,pin:hp(p),active:true,dp:false});
+    log("staff.add",`${n} (${ROLES[$("nur").value]})`);flash("Staff member added.");commit();
+  }
+};
+
+/* ---------- live inputs ---------- */
+const inputs={
+  acct:curLabel,xf:xCalc,xt:xCalc,xa:xCalc,xr:xCalc,
+  q:renderLedger,fs:renderLedger,fa:renderLedger,fd:renderLedger,aq:renderAudit,
+  bc:el=>{if(ui.cur!==el.value){ui.cur=el.value;views.dash()}},
+  cacct:el=>{if(ui.cacct!==el.value){ui.cacct=el.value;views.close()}},
+  cd:el=>{if(el.value&&ui.cd!==el.value){ui.cd=el.value;views.close()}},
+  cnt:el=>{const a=acct(ui.cacct),v=rd((parseFloat(el.value)||0)-ui.exp);$("cv").textContent=el.value===""?"":`Variance: ${fmt(a.cur,v)}${v===0?" (balanced)":v>0?" (over)":" (short)"}`}
+};
+const chg={
+  role:el=>{const a=acct(el.dataset.a),r=el.dataset.r;a.roles=a.roles.filter(x=>x!==r);if(el.checked)a.roles.push(r);log("account.access",`${a.name}: ${r} ${el.checked?"allowed":"removed"}`);save()},
+  active:el=>{
+    const a=acct(el.dataset.a);
+    if(!el.checked&&(bal(a.id,"9999-12-31")!==0||st.tx.some(x=>x.acct===a.id&&x.status==="pending"))){flash("Move the balance out and clear pending entries before deactivating.",1);return render()}
+    a.active=el.checked;log(a.active?"account.activate":"account.deactivate",a.name);commit();
+  },
+  open:el=>{const a=acct(el.dataset.a),v=parseFloat(el.value);if(!isFinite(v))return render();a.opening=rd(v);log("account.opening",`${a.name} = ${fmt(a.cur,a.opening)}`);commit()},
+  rate:el=>{const v=parseFloat(el.value);if(!(v>0)){flash("Enter a rate above zero.",1);return render()}st.rate=v;log("rate",`1 USD = ${v} SSP`);flash("Rate updated.");commit()},
+  urole:el=>{
+    const t=user(el.dataset.u),mg=st.users.filter(u=>u.active&&u.role==="manager");
+    if(t.role==="manager"&&el.value!=="manager"&&t.active&&mg.length<2){flash("Keep at least one active manager.",1);return render()}
+    log("staff.role",`${t.name}: ${ROLES[t.role]} → ${ROLES[el.value]}`);t.role=el.value;commit();
+  }
+};
+
+/* =====================================================================
+   BUSINESS REPORT BOOK — Excel-like grid saved in st.businessReportBook (month closings in st.reportCloses).
+   Every row gets an automatic date; closed months are locked.
+   ===================================================================== */
+const GCOLS=[
+  {k:"consignee",label:"Consignee names",req:1,max:80,w:190},
+  {k:"truck",label:"Truck number",req:1,max:15,w:120},
+  {k:"goods",label:"Type of goods",req:1,max:120,w:180},
+  {k:"manifest",label:"Manifest (SSP)",num:1,w:130},
+  {k:"verification",label:"Verification (SSP)",num:1,w:130},
+  {k:"tariff",label:"Tariff (SSP)",num:1,w:120},
+  {k:"account",label:"Account",max:40,w:150},
+  {k:"parking",label:"Parking fee (SSP)",num:1,w:130},
+  {k:"adminrel",label:"Admin release (SSP)",num:1,w:140},
+  {k:"commerce",label:"Commerce (SSP)",num:1,w:130},
+  {k:"ssnbs",label:"SSNBS inspection fee (SSP)",num:1,w:170},
+  {k:"security",label:"Security (SSP)",num:1,w:130},
+  {k:"gate",label:"Release fee at the gate (SSP)",num:1,w:160},
+  {k:"jebel",label:"Jebel release fee (SSP)",num:1,w:140},
+  {k:"secjebel",label:"Security Jebel (SSP)",num:1,w:140}
+];
+const GMAX=2000,GBIG=999999999999;
+const monthOf=d=>String(d).slice(0,7);
+const fmtMonth=m=>new Date(m+"-01T00:00:00").toLocaleDateString("en",{month:"long",year:"numeric"});
+const closedMonth=m=>st.reportCloses.find(c=>c.m===m);
+const lockedDate=d=>!!closedMonth(monthOf(d));
+const canCloseMonth=u=>!!u&&(u.role==="manager"||!!u.close);
+const lastClosed=()=>st.reportCloses.reduce((a,c)=>c.m>a?c.m:a,"");
+
+const gDate=v=>{ // accepts YYYY-MM-DD, DD/MM/YYYY, DD-MM-YYYY, DD.MM.YYYY (day first); returns YYYY-MM-DD or the text unchanged
+  let m=v.match(/^(\d{4})[-\/.](\d{1,2})[-\/.](\d{1,2})$/),y,mo,d;
+  if(m){y=+m[1];mo=+m[2];d=+m[3]}
+  else if(m=v.match(/^(\d{1,2})[-\/.](\d{1,2})[-\/.](\d{2}|\d{4})$/)){d=+m[1];mo=+m[2];y=+m[3];if(y<100)y+=2000}
+  else return v;
+  const t=new Date(Date.UTC(y,mo-1,d));
+  return t.getUTCFullYear()===y&&t.getUTCMonth()===mo-1&&t.getUTCDate()===d?y+"-"+pad(mo)+"-"+pad(d):v;
+};
+const gNorm=(c,v)=>{
+  v=String(v==null?"":v).replace(/\s+/g," ").trim();
+  if(c.k==="truck")return v.toUpperCase();
+  if(c.date)return gDate(v);
+  if(c.opts){const l=v.toLowerCase();return c.opts.find(o=>o.toLowerCase()===l||o.toLowerCase()+"ed"===l)||v}
+  if(c.num){const s=v.replace(/\s/g,"");return /^-?\d{1,3}(,\d{3})+(\.\d+)?$/.test(s)?s.replace(/,/g,""):s}
+  return v;
+};
+const gErr=(c,v)=>{
+  if(!v)return c.req?"Required":"";
+  if(c.max&&v.length>c.max)return"Too long (max "+c.max+" characters)";
+  if(c.k==="truck"&&!/^[A-Z0-9][A-Z0-9 \-\/]{2,14}$/.test(v))return"3–15 letters or numbers (spaces and hyphens allowed)";
+  if(c.opts&&!c.opts.includes(v))return"Choose Confirm or Reject";
+  if(c.date){
+    if(!/^\d{4}-\d{2}-\d{2}$/.test(v))return"Enter a real date, e.g. 2026-10-18 or 18/10/2026";
+    if(v<"2000-01-01")return"Date is too far in the past";
+    if(v>ago(0))return"Arrival cannot be in the future";
+    return"";
+  }
+  if(c.num){
+    if(!(c.neg?/^-?\d+(\.\d{1,2})?$/:/^\d+(\.\d{1,2})?$/).test(v))return c.neg?"Numbers only (minus allowed), up to 2 decimals":"Numbers only, up to 2 decimals";
+    if(Math.abs(+v)>GBIG)return"Too large";
+  }
+  return"";
+};
+const gBlank=r=>r.v.every(x=>!String(x).trim());
+const GTOT="Total Amount (SSP)";
+// every amount column from ARRIVAL to SECURITY JEBEL (all in SSP) is added up automatically
+const gRowTotal=r=>{let t=0;GCOLS.forEach((c,j)=>{if(c.num){const x=gNorm(c,r.v[j]),v=x===""?NaN:Number(x);if(isFinite(v))t+=v}});return Math.round(t*100)/100};
+const gTotTxt=r=>gBlank(r)?"":gRowTotal(r).toLocaleString("en-US",{minimumFractionDigits:2,maximumFractionDigits:2});
+const gCell=(r,j)=>{const c=GCOLS[j];return gErr(c,gNorm(c,r.v[j]))};
+const gNew=()=>({id:null,d:ago(0),v:GCOLS.map(()=>""),sel:false,touch:{}});
+const gVisible=r=>!ui.g.month||monthOf(r.d)===ui.g.month;
+
+function gLoad(keepMonth){
+  const rows=st.businessReportBook.map(x=>({id:x.id,d:x.d,v:GCOLS.map(c=>x[c.k]==null?"":String(x[c.k])),sel:false,touch:{}}));
+  const cm=monthOf(ago(0));
+  if(!lockedDate(ago(0)))while(rows.filter(r=>monthOf(r.d)===cm).length<5)rows.push(gNew());
+  ui.g={rows,dirty:false,show:false,month:keepMonth==null?cm:keepMonth};
+}
+function gNormAll(){ui.g.rows.forEach(r=>{if(!lockedDate(r.d))r.v=r.v.map((x,j)=>gNorm(GCOLS[j],x))})}
+function gErrors(){const out=[];ui.g.rows.forEach((r,i)=>{if(gBlank(r)||lockedDate(r.d))return;GCOLS.forEach((c,j)=>{const m=gCell(r,j);if(m)out.push({i,j,m})})});return out}
+function gCellErr(r,j){if(gBlank(r)||lockedDate(r.d)||!(ui.g.show||r.touch[j]))return"";return gCell(r,j)}
+function gStat(){
+  const s=$("gstat");if(!s||!ui.g)return;
+  const L=ui.g.rows.filter(r=>gVisible(r)&&!gBlank(r));
+  s.innerHTML=`${L.length} row${L.length===1?"":"s"} in view · ${ui.g.dirty?'<span class="dirty">unsaved changes</span>':"saved"}`;
+  const t=$("gtot");if(!t)return;
+  const sums=GCOLS.map((c,j)=>c.num?[c,L.reduce((a,r)=>{const x=gNorm(c,r.v[j]),v=x===""?NaN:Number(x);return a+(isFinite(v)?v:0)},0)]:null).filter(Boolean);
+  sums.push([{label:GTOT},L.reduce((a,r)=>a+gRowTotal(r),0)]);
+  t.innerHTML=L.length?"Totals in view: "+sums.map(([c,v])=>`${esc(c.label)} <b class="num">${v.toLocaleString("en-US",{minimumFractionDigits:2,maximumFractionDigits:2})}</b>`).join(" · "):"";
+}
+function gSummary(){
+  const s=$("gsum");if(!s||!ui.g)return;
+  if(!ui.g.show){s.textContent="";return}
+  const E=gErrors();
+  s.textContent=E.length?`${E.length} cell${E.length>1?"s":""} need fixing: `+E.slice(0,5).map(x=>`row ${x.i+1} · ${GCOLS[x.j].label} (${x.m})`).join("; ")+(E.length>5?"; …":""):"";
+}
+function gRowHTML(r,i,n){
+  const lk=lockedDate(r.d);
+  return`<tr data-r="${i}"${r.sel||lk?` class="${[r.sel?"sel":"",lk?"lock":""].join(" ").trim()}"`:""}><td class="n"><input type="checkbox" tabindex="-1" data-gsel="${i}" ${r.sel?"checked":""}${lk?" disabled":""} aria-label="Select row ${n}">${n}</td><td class="gd num" title="${lk?"This month is closed":"Automatic date"}">${esc(r.d)}${lk?' <span class="bd closed">closed</span>':""}</td>`+
+    GCOLS.map((c,j)=>{
+      const e=gCellErr(r,j),at=`data-r="${i}" data-c="${j}" aria-label="${esc(c.label)}, row ${n}"${e?' aria-invalid="true"':""}`;
+      let el;
+      if(c.opts&&!lk){const cur=r.v[j];el=`<select class="gc gs" ${at}><option value=""></option>${c.opts.concat(cur&&!c.opts.includes(cur)?[cur]:[]).map(o=>`<option${o===cur?" selected":""}>${esc(o)}</option>`).join("")}</select>`}
+      else el=`<input class="gc${c.num?" r":""}" ${at} value="${esc(r.v[j])}" maxlength="${c.max||16}"${c.num?' inputmode="decimal"':""}${lk?" readonly":""} autocomplete="off">`;
+      return`<td${e?` class="bad" title="${esc(e)}"`:""}>${el}</td>`}).join("")+`<td class="gd num gtot" style="text-align:right;color:var(--ink);font-weight:500" title="Calculated automatically">${gTotTxt(r)}</td></tr>`;
+}
+function renderGrid(){
+  const b=$("gb");if(!b||!ui.g)return;let n=0;
+  b.innerHTML=ui.g.rows.map((r,i)=>gVisible(r)?gRowHTML(r,i,++n):"").join("");
+  $("gempty").hidden=n>0;
+  const V=ui.g.rows.filter(gVisible),all=$("gall");if(all)all.checked=V.length>0&&V.every(r=>r.sel||lockedDate(r.d));
+  gStat();gSummary();gBar();
+}
+function gPaint(i){
+  const tr=document.querySelector(`#gb tr[data-r="${i}"]`);if(!tr)return;const r=ui.g.rows[i];
+  const tc=tr.querySelector("td.gtot");if(tc)tc.textContent=gTotTxt(r);
+  tr.querySelectorAll(".gc").forEach(el=>{
+    const e=gCellErr(r,+el.dataset.c),td=el.parentNode;
+    td.classList.toggle("bad",!!e);
+    if(e){td.title=e;el.setAttribute("aria-invalid","true")}else{td.removeAttribute("title");el.removeAttribute("aria-invalid")}
+  });
+}
+function gFocus(i,j){const el=document.querySelector(`#gb .gc[data-r="${i}"][data-c="${j}"]`);if(el){el.focus();if(el.tagName==="INPUT")el.select()}}
+function gBar(){
+  const el=$("gbar");if(!el||!ui.g)return;
+  const u=me(),today=ago(0),cm=monthOf(today),m=ui.g.month,cl=m&&closedMonth(m);
+  const ms=[...new Set([cm,...st.businessReportBook.map(x=>monthOf(x.d)),...ui.g.rows.map(r=>monthOf(r.d)),...st.reportCloses.map(c=>c.m)])].sort().reverse();
+  let act="";
+  if(m&&!cl&&canCloseMonth(u))act=`<button class="primary" type="button" data-act="gclose">Close ${esc(fmtMonth(m))}</button>`;
+  else if(cl&&u.role==="manager"&&cl.m===lastClosed())act=`<button class="ghost bad" type="button" data-act="greopen">Reopen month</button>`;
+  el.innerHTML=`<div class="mbar"><div><span class="mute">Today (automatic date)</span><br><b>${esc(new Date(today+"T00:00:00").toLocaleDateString("en",{weekday:"long",day:"numeric",month:"long",year:"numeric"}))}</b></div>
+  <label>Month<select id="gmonth"><option value=""${m===""?" selected":""}>All months</option>${ms.map(x=>`<option value="${x}"${x===m?" selected":""}>${esc(fmtMonth(x))}${closedMonth(x)?" (closed)":""}</option>`).join("")}</select></label>
+  <div>${m?(cl?`<span class="bd closed">Closed</span> <span class="note">by ${esc(uname(cl.by))} on ${esc(cl.ts.slice(0,10))}</span>`:'<span class="bd">Open</span>'):""}</div>
+  <div>${act}</div></div>
+  <div class="note" style="margin-bottom:10px">Closing a month locks its rows (no edits, no deletes) so the month's data stays in order. ${canCloseMonth(u)?"":"Only the manager, or staff the manager has authorised, can close a month."}</div>`;
+}
+function gAdd(col){
+  const cm=monthOf(ago(0));
+  if(lockedDate(ago(0)))return flash(`${fmtMonth(cm)} is closed. A manager must reopen it before new rows can be added.`,1);
+  const R=ui.g.rows;if(R.length>=GMAX)return flash("Row limit reached ("+GMAX+").",1);
+  R.push(gNew());
+  if(ui.g.month&&ui.g.month!==cm){ui.g.month=cm;renderGrid();return gFocus(R.length-1,col||0)}
+  $("gb").insertAdjacentHTML("beforeend",gRowHTML(R[R.length-1],R.length-1,R.filter(gVisible).length));
+  $("gempty").hidden=true;const all=$("gall");if(all)all.checked=false;
+  gStat();gFocus(R.length-1,col||0);
+}
+function gDelete(){
+  ui.g.rows.forEach(r=>{if(lockedDate(r.d))r.sel=false});
+  const ticked=ui.g.rows.filter(r=>r.sel).length;
+  if(!ticked)return flash("Tick the rows you want to delete first (rows in a closed month cannot be deleted).",1);
+  ui.g.rows=ui.g.rows.filter(r=>!r.sel);
+  const cm=monthOf(ago(0));
+  if(!lockedDate(ago(0))&&!ui.g.rows.some(r=>monthOf(r.d)===cm))ui.g.rows.push(gNew());
+  ui.g.dirty=true;renderGrid();flash(`${ticked} row${ticked>1?"s":""} removed — press Save to keep the change.`);
+}
+async function gSave(){
+  if(gSave.busy||!ui.g)return;gSave.busy=1;
+  try{
+    const g=ui.g;gNormAll();
+    const E=gErrors();
+    if(E.length){g.show=true;const r0=g.rows[E[0].i];if(!gVisible(r0))g.month=monthOf(r0.d);renderGrid();gFocus(E[0].i,E[0].j);return flash(`${E.length} cell${E.length>1?"s":""} need fixing — marked in red.`,1)}
+    g.show=false;
+    if(g.rows.some(r=>!r.id&&!gBlank(r)&&lockedDate(r.d)))return flash("A new row belongs to a closed month. Ask a manager to reopen it.",1);
+    const u=me(),now=new Date().toISOString(),prev=new Map(st.businessReportBook.map(x=>[x.id,x]));
+    let add=0,chg=0;
+    const out=g.rows.filter(r=>!gBlank(r)).map(r=>{
+      const p=r.id&&prev.get(r.id);
+      if(p&&lockedDate(p.d))return p; // closed month: never changed
+      const o={};GCOLS.forEach((c,j)=>{const x=r.v[j];o[c.k]=c.num?(x===""?null:Number(x)):x});
+      if(p){if(GCOLS.every(c=>p[c.k]===o[c.k]))return p;chg++;return{...p,...o,uby:u.id,uts:now}}
+      add++;return{id:uid(),d:r.d,...o,by:u.id,ts:now};
+    });
+    const keepIds=new Set(out.map(o=>o.id)),gone=st.businessReportBook.filter(x=>!keepIds.has(x.id));
+    if(gone.some(x=>lockedDate(x.d)))return flash("Rows in a closed month cannot be removed.",1);
+    if(!add&&!chg&&!gone.length){renderGrid();return flash("Nothing has changed.")}
+    if(gone.length){const v=await ask(`Remove ${gone.length} saved row${gone.length>1?"s":""}?`,[],"Save");if(!v)return}
+    st.businessReportBook=out;
+    log("report.save",`added ${add}, changed ${chg}, removed ${gone.length} · ${out.length} rows in table`);
+    flash(`Saved ${out.length} row${out.length===1?"":"s"}.`);ui.g.dirty=false;commit();
+  }finally{gSave.busy=0}
+}
+function gExport(){
+  const g=ui.g;if(!g)return;gNormAll();
+  const E=gErrors();
+  if(E.length){g.show=true;const r0=g.rows[E[0].i];if(!gVisible(r0))g.month=monthOf(r0.d);renderGrid();gFocus(E[0].i,E[0].j);return flash(`Fix the ${E.length} red cell${E.length>1?"s":""} before exporting.`,1)}
+  const R=g.rows.filter(r=>gVisible(r)&&!gBlank(r));if(!R.length)return flash("There are no rows to export in this view.",1);
+  const data=[["Entry date",...GCOLS.map(c=>c.label),GTOT],...R.map(r=>[r.d,...r.v.map((x,j)=>GCOLS[j].num&&x!==""?Number(x):x),gRowTotal(r)])];
+  download(xlsx(data,[14,...GCOLS.map(c=>c.w/6),20],"Business Report book"),`business-report-book-${g.month||"all"}.xlsx`);
+  log("report.export",`${R.length} rows · ${g.month||"all months"}`);save();
+  flash(`Exported ${R.length} row${R.length>1?"s":""}${g.dirty?" (includes unsaved changes)":""}.`);
+}
+// Tab-separated text (as copied from Excel) -> matrix. Handles quoted cells.
+function gTsv(s){
+  const rows=[];let row=[],cur="",q=false;
+  for(let i=0;i<s.length;i++){
+    const ch=s[i];
+    if(q){if(ch==='"'){if(s[i+1]==='"'){cur+='"';i++}else q=false}else cur+=ch}
+    else if(ch==='"'&&cur==="")q=true;
+    else if(ch==="\t"){row.push(cur);cur=""}
+    else if(ch==="\n"){row.push(cur);rows.push(row);row=[];cur=""}
+    else if(ch!=="\r")cur+=ch;
+  }
+  row.push(cur);rows.push(row);return rows;
+}
+views.cargo=()=>{
+  if(!ui.g||!ui.g.dirty)gLoad(ui.g?ui.g.month:undefined);
+  main(`<section class="card"><h2>Business Report book</h2>
+  <div id="gbar"></div>
+  <div class="note" style="margin-bottom:10px">Type straight into the cells. <b>Tab</b>, <b>Enter</b> and the <b>arrow keys</b> move between cells Paste rows copied from Excel into any cell. Fields marked <span class="out-t">*</span> are required (consignee, truck number, type of goods); Manifest and all fee columns are optional numbers in SSP (the standard currency), 0 or more, up to 2 decimals. <b>Total Amount (SSP)</b> is calculated automatically by adding Manifest, Verification and every other fee up to Security Jebel. The entry date is added automatically when a row is created. Nothing is stored until you press <b>Save</b>.</div>
+  <div class="gtools"><button class="ghost" type="button" data-act="gadd">+ Add row</button><button class="ghost bad" type="button" data-act="gdel">Delete selected</button><button class="primary" type="button" data-act="gsave">Save</button><button class="ghost" type="button" data-act="gxlsx">Export .xlsx</button><span id="gstat" class="note"></span></div>
+  <div class="gw"><table class="grid rgrid"><colgroup><col style="width:60px"><col style="width:120px">${GCOLS.map(c=>`<col style="width:${c.w}px">`).join("")}<col style="width:170px"></colgroup>
+  <thead><tr><th class="n"><input type="checkbox" id="gall" tabindex="-1" aria-label="Select all rows in view"></th><th>Date</th>${GCOLS.map(c=>`<th title="${esc(c.label)}">${esc(c.label)}${c.req?' <span class="out-t">*</span>':""}</th>`).join("")}<th class="r" title="${GTOT}">${GTOT}</th></tr></thead><tbody id="gb"></tbody></table></div>
+  <div class="empty" id="gempty" hidden>No rows in this view yet. Press + Add row.</div>
+  <div class="note" id="gtot" style="margin-top:8px"></div>
+  <div class="gerr" id="gsum" role="alert"></div></section>`);
+  $("main").style.maxWidth="1500px";
+  renderGrid();
+};
+Object.assign(acts,{
+  gadd:()=>gAdd(0),gdel:gDelete,gsave:gSave,gxlsx:gExport,
+  gclose:async()=>{
+    const u=me(),g=ui.g,m=g&&g.month;
+    if(!canCloseMonth(u))return flash("You do not have authority to close a month.",1);
+    if(!m)return flash("Choose the month you want to close.",1);
+    if(closedMonth(m))return flash("This month is already closed.",1);
+    if(g.dirty)return flash("Save your changes first, then close the month.",1);
+    const n=st.businessReportBook.filter(x=>monthOf(x.d)===m).length;
+    if(!n)return flash("There are no saved report rows in this month to close.",1);
+    const early=[...new Set(st.businessReportBook.map(x=>monthOf(x.d)))].filter(k=>k<m&&!closedMonth(k)).sort();
+    if(early.length)return flash("Close earlier months first: "+early.map(fmtMonth).join(", ")+".",1);
+    const v=await ask(`Close ${fmtMonth(m)}? ${n} row${n>1?"s":""} will be locked${m===monthOf(ago(0))?" and no new rows can be added until it is reopened":""}.`,[{k:"n",label:"Note (optional)",attr:'maxlength="120"'}],"Close month");
+    if(!v||closedMonth(m))return;
+    st.reportCloses.push({id:uid(),m,by:u.id,ts:new Date().toISOString(),rows:n,note:v.n});
+    log("report.month.close",`${fmtMonth(m)} · ${n} rows${v.n?" – "+v.n:""}`);flash(`${fmtMonth(m)} closed.`);commit();
+  },
+  greopen:async()=>{
+    const u=me(),m=ui.g&&ui.g.month,c=m&&closedMonth(m);
+    if(!c)return;
+    if(u.role!=="manager")return flash("Only a manager can reopen a month.",1);
+    if(c.m!==lastClosed())return flash("Reopen the most recent closed month first.",1);
+    const v=await ask(`Reopen ${fmtMonth(m)}`,[{k:"r",label:"Reason",req:1,attr:'maxlength="100"'}],"Reopen");if(!v)return;
+    st.reportCloses=st.reportCloses.filter(x=>x.id!==c.id);
+    log("report.month.reopen",`${fmtMonth(m)} – ${v.r}`);flash(`${fmtMonth(m)} reopened.`);commit();
+  }
+});
+inputs.gmonth=el=>{if(!ui.g||ui.g.month===el.value)return;ui.g.month=el.value;ui.g.rows.forEach(r=>{if(!gVisible(r))r.sel=false});renderGrid()};
+
+document.addEventListener("keydown",e=>{
+  const el=e.target;
+  if(!(el.classList&&el.classList.contains("gc"))||!ui.g||e.ctrlKey||e.metaKey||e.altKey)return;
+  const R=ui.g.rows,i=+el.dataset.r,j=+el.dataset.c,k=e.key,last=GCOLS.length-1,sel=el.tagName==="SELECT";
+  const V=R.map((r,x)=>x).filter(x=>gVisible(R[x])),p=V.indexOf(i);
+  const go=(a,b)=>{e.preventDefault();gFocus(a,b)};
+  const len=sel?0:el.value.length,s=sel?0:el.selectionStart,t=sel?0:el.selectionEnd;
+  if(k==="Enter"){
+    if(e.shiftKey){if(p>0)go(V[p-1],j);else e.preventDefault()}
+    else if(p<V.length-1)go(V[p+1],j);
+    else{e.preventDefault();if(!gBlank(R[i]))gAdd(j)}
+  }
+  else if(k==="ArrowDown"){if(p<V.length-1)go(V[p+1],j);else if(sel)e.preventDefault()}
+  else if(k==="ArrowUp"){if(p>0)go(V[p-1],j);else if(sel)e.preventDefault()}
+  else if(k==="ArrowLeft"){if(j>0&&(sel||(s===0&&(t===0||t===len))))go(i,j-1)}
+  else if(k==="ArrowRight"){if(j<last&&(sel||(t===len&&(s===len||s===0))))go(i,j+1)}
+  else if(k==="Tab"&&!e.shiftKey&&p===V.length-1&&j===last&&!gBlank(R[i])){e.preventDefault();gAdd(0)}
+});
+document.addEventListener("focusin",e=>{const el=e.target;if(el.classList&&el.classList.contains("gc")&&el.tagName==="INPUT")setTimeout(()=>{if(document.activeElement===el)el.select()},0)});
+document.addEventListener("input",e=>{
+  const el=e.target;if(!(el.classList&&el.classList.contains("gc"))||!ui.g)return;
+  const i=+el.dataset.r;ui.g.rows[i].v[+el.dataset.c]=el.value;ui.g.dirty=true;gStat();gPaint(i);
+});
+document.addEventListener("change",e=>{
+  const el=e.target;if(!ui.g||!el.dataset)return;
+  if(el.classList.contains("gc")){
+    const i=+el.dataset.r,j=+el.dataset.c,r=ui.g.rows[i],v=gNorm(GCOLS[j],el.value);
+    if(el.tagName==="INPUT")el.value=v;r.v[j]=v;r.touch[j]=true;ui.g.dirty=true;gPaint(i);gSummary();gStat();
+  }else if(el.dataset.gsel!==undefined){
+    const i=+el.dataset.gsel;ui.g.rows[i].sel=el.checked;el.closest("tr").classList.toggle("sel",el.checked);
+    const all=$("gall");if(all)all.checked=ui.g.rows.filter(gVisible).every(r=>r.sel||lockedDate(r.d));
+  }else if(el.id==="gall"){ui.g.rows.forEach(r=>{if(gVisible(r)&&!lockedDate(r.d))r.sel=el.checked});renderGrid()}
+});
+document.addEventListener("paste",e=>{
+  const el=e.target;if(!(el.classList&&el.classList.contains("gc"))||!ui.g)return;
+  const raw=((e.clipboardData||window.clipboardData).getData("text")||"").replace(/\r?\n$/,"");
+  if(!/[\t\r\n]/.test(raw))return; // a single value: let the browser paste it normally
+  e.preventDefault();
+  let M=gTsv(raw).map(row=>row.map(x=>x.replace(/\s*\n\s*/g," ")));
+  if(M[0].some(h=>GCOLS.some(c=>c.label.toLowerCase()===h.trim().toLowerCase())))M=M.slice(1); // skip a pasted header row
+  if(!M.length)return;
+  const R=ui.g.rows,V=R.map((r,x)=>x).filter(x=>gVisible(R[x])),r0=+el.dataset.r,c0=+el.dataset.c,p0=V.indexOf(r0),cm=monthOf(ago(0));
+  let msg="";
+  const extra=Math.max(0,p0+M.length-V.length);
+  if(extra&&lockedDate(ago(0)))return flash(`${fmtMonth(cm)} is closed, so new rows cannot be added.`,1);
+  if(extra&&R.length+extra>GMAX){M=M.slice(0,V.length-p0+(GMAX-R.length));msg=` Stopped at the ${GMAX}-row limit.`}
+  for(let i=0;i<M.length;i++){const x=V[p0+i];if(x!==undefined&&lockedDate(R[x].d))return flash("The pasted block reaches rows in a closed month. Nothing was pasted.",1)}
+  if(p0+M.length>V.length&&ui.g.month&&ui.g.month!==cm)ui.g.month=""; // show new rows next to the old ones
+  let cut=false;
+  M.forEach((row,i)=>{
+    let x=V[p0+i];if(x===undefined){R.push(gNew());x=R.length-1;V.push(x)}
+    const r=R[x];row.forEach((val,j)=>{const cj=c0+j;if(cj>=GCOLS.length){cut=true;return}r.v[cj]=gNorm(GCOLS[cj],val);r.touch[cj]=true});
+  });
+  ui.g.dirty=true;renderGrid();gFocus(r0,c0);
+  flash(`Pasted ${M.length} row${M.length>1?"s":""}.`+(cut?" Extra columns were ignored.":"")+msg);
+});
+window.addEventListener("beforeunload",e=>{if(ui.g&&ui.g.dirty){e.preventDefault();e.returnValue=""}});
+
+/* ---------- download helper + minimal .xlsx writer (no libraries needed) ---------- */
+function download(blob,name){
+  const url=URL.createObjectURL(blob),a=document.createElement("a");a.href=url;a.download=name;
+  document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),1000);
+}
+const crcT=(()=>{const t=new Uint32Array(256);for(let n=0;n<256;n++){let c=n;for(let k=0;k<8;k++)c=c&1?0xEDB88320^(c>>>1):c>>>1;t[n]=c}return t})();
+const crc32=b=>{let c=0xFFFFFFFF;for(let i=0;i<b.length;i++)c=crcT[(c^b[i])&255]^(c>>>8);return(c^0xFFFFFFFF)>>>0};
+function zipParts(files){ // "stored" (uncompressed) zip
+  const enc=new TextEncoder(),out=[],cd=[];let off=0;
+  const w16=n=>[n&255,(n>>>8)&255],w32=n=>[n&255,(n>>>8)&255,(n>>>16)&255,(n>>>24)&255];
+  for(const[name,txt]of files){
+    const nb=enc.encode(name),db=enc.encode(txt),c=crc32(db);
+    const lh=new Uint8Array([0x50,0x4b,3,4,...w16(20),...w16(0x800),...w16(0),...w16(0),...w16(0x21),...w32(c),...w32(db.length),...w32(db.length),...w16(nb.length),...w16(0)]);
+    out.push(lh,nb,db);
+    cd.push(new Uint8Array([0x50,0x4b,1,2,...w16(20),...w16(20),...w16(0x800),...w16(0),...w16(0),...w16(0x21),...w32(c),...w32(db.length),...w32(db.length),...w16(nb.length),...w16(0),...w16(0),...w16(0),...w16(0),...w32(0),...w32(off)]),nb);
+    off+=lh.length+nb.length+db.length;
+  }
+  const cdLen=cd.reduce((s,a)=>s+a.length,0);
+  const end=new Uint8Array([0x50,0x4b,5,6,...w16(0),...w16(0),...w16(files.length),...w16(files.length),...w32(cdLen),...w32(off),...w16(0)]);
+  return[...out,...cd,end];
+}
+function xlsxParts(rows,widths,sheetName="Consignments"){
+  const col=n=>{let s="";for(n++;n>0;n=Math.floor((n-1)/26))s=String.fromCharCode(65+(n-1)%26)+s;return s};
+  const x=s=>String(s).replace(/[\u0000-\u0008\u000b\u000c\u000e-\u001f]/g,"").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");
+  const H='<?xml version="1.0" encoding="UTF-8" standalone="yes"?>',NS='xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main"';
+  const sheet=`${H}<worksheet ${NS}><sheetViews><sheetView workbookViewId="0"><pane ySplit="1" topLeftCell="A2" activePane="bottomLeft" state="frozen"/></sheetView></sheetViews><cols>${widths.map((w,i)=>`<col min="${i+1}" max="${i+1}" width="${Math.max(10,Math.round(w))}" customWidth="1"/>`).join("")}</cols><sheetData>${rows.map((r,i)=>`<row r="${i+1}">${r.map((v,j)=>{const ref=col(j)+(i+1);return typeof v==="number"?`<c r="${ref}"><v>${v}</v></c>`:`<c r="${ref}"${i===0?' s="1"':""} t="inlineStr"><is><t xml:space="preserve">${x(v)}</t></is></c>`}).join("")}</row>`).join("")}</sheetData></worksheet>`;
+  const styles=`${H}<styleSheet ${NS}><fonts count="2"><font><sz val="11"/><name val="Calibri"/></font><font><b/><sz val="11"/><name val="Calibri"/></font></fonts><fills count="2"><fill><patternFill patternType="none"/></fill><fill><patternFill patternType="gray125"/></fill></fills><borders count="1"><border><left/><right/><top/><bottom/><diagonal/></border></borders><cellStyleXfs count="1"><xf numFmtId="0" fontId="0" fillId="0" borderId="0"/></cellStyleXfs><cellXfs count="2"><xf numFmtId="0" fontId="0" fillId="0" borderId="0" xfId="0"/><xf numFmtId="0" fontId="1" fillId="0" borderId="0" xfId="0" applyFont="1"/></cellXfs><cellStyles count="1"><cellStyle name="Normal" xfId="0" builtinId="0"/></cellStyles></styleSheet>`;
+  const R="http://schemas.openxmlformats.org/officeDocument/2006/relationships",PR="http://schemas.openxmlformats.org/package/2006/relationships";
+  return zipParts([
+    ["[Content_Types].xml",`${H}<Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types"><Default Extension="rels" ContentType="application/vnd.openxmlformats-package.relationships+xml"/><Default Extension="xml" ContentType="application/xml"/><Override PartName="/xl/workbook.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet.main+xml"/><Override PartName="/xl/worksheets/sheet1.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.worksheet+xml"/><Override PartName="/xl/styles.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.styles+xml"/></Types>`],
+    ["_rels/.rels",`${H}<Relationships xmlns="${PR}"><Relationship Id="rId1" Type="${R}/officeDocument" Target="xl/workbook.xml"/></Relationships>`],
+    ["xl/workbook.xml",`${H}<workbook ${NS} xmlns:r="${R}"><sheets><sheet name="${sheetName}" sheetId="1" r:id="rId1"/></sheets></workbook>`],
+    ["xl/_rels/workbook.xml.rels",`${H}<Relationships xmlns="${PR}"><Relationship Id="rId1" Type="${R}/worksheet" Target="worksheets/sheet1.xml"/><Relationship Id="rId2" Type="${R}/styles" Target="styles.xml"/></Relationships>`],
+    ["xl/worksheets/sheet1.xml",sheet],
+    ["xl/styles.xml",styles]
+  ]);
+}
+const xlsx=(rows,widths,sheetName)=>new Blob(xlsxParts(rows,widths,sheetName),{type:"application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"});
+
+/* =====================================================================
+   DATA — PDF-only documents. Each PDF must be named; it can be downloaded any time.
+   Details (name, size, who, when) live in st.docs; the file itself is kept in IndexedDB.
+   ===================================================================== */
+const MAXPDF=10*1024*1024;
+const idb=(()=>{
+  let p=null;
+  const open=()=>p||(p=new Promise((res,rej)=>{
+    if(!window.indexedDB)return rej(new Error("no indexedDB"));
+    const q=indexedDB.open("cashbook.files",1);
+    q.onupgradeneeded=()=>q.result.createObjectStore("f");
+    q.onsuccess=()=>res(q.result);q.onerror=()=>rej(q.error);
+  }).catch(e=>{p=null;throw e}));
+  const run=(mode,fn)=>open().then(db=>new Promise((res,rej)=>{
+    const t=db.transaction("f",mode),req=fn(t.objectStore("f"));
+    t.oncomplete=()=>res(req.result);t.onerror=t.onabort=()=>rej(t.error);
+  }));
+  return{put:(k,v)=>run("readwrite",s=>s.put(v,k)),get:k=>run("readonly",s=>s.get(k)),del:k=>run("readwrite",s=>s.delete(k))};
+})();
+const readBuf=f=>f.arrayBuffer?f.arrayBuffer():new Promise((res,rej)=>{const r=new FileReader();r.onload=()=>res(r.result);r.onerror=()=>rej(r.error);r.readAsArrayBuffer(f)});
+const fsize=b=>b<1048576?Math.max(1,Math.round(b/1024))+" KB":(b/1048576).toFixed(1)+" MB";
+const fname=n=>(n.replace(/[\\\/:*?"<>|\u0000-\u001f]/g,"_").replace(/\s+/g," ").trim().slice(0,80)||"document")+".pdf";
+views.data=()=>{
+  main(`<div class="cols"><section class="card"><h2>Upload a PDF</h2>
+  <form id="up" novalidate><label>Document name <span class="mute">(required)</span><input id="upn" maxlength="80" placeholder="e.g. CUDA 1042 – Delta Traders" autocomplete="off"></label>
+  <label>PDF file<input id="upf" type="file" accept="application/pdf,.pdf"></label>
+  <div class="note">Only PDF files up to 10 MB are accepted, and every PDF must have a name before it can be uploaded. Any other file type is rejected.</div>
+  <div class="err" id="err" role="alert"></div><button class="primary" type="submit">Upload PDF</button></form></section>
+  <section class="card"><h2>Documents (${st.docs.length})</h2><div class="tools"><input id="dq" type="search" placeholder="Search by name, file or uploader" aria-label="Search"></div>
+  <div class="tw"><table><thead><tr><th>Name</th><th>File</th><th class="r">Size</th><th>Uploaded by</th><th>When</th><th></th></tr></thead><tbody id="drows"></tbody></table></div>
+  <div class="empty" id="dempty" hidden>No PDFs found.</div></section></div>`);
+  renderDocs();
+};
+function renderDocs(){
+  const u=me(),q=(($("dq")||{}).value||"").toLowerCase();
+  const L=st.docs.slice().sort((a,b)=>b.ts.localeCompare(a.ts)).filter(d=>!q||(d.name+" "+d.file+" "+uname(d.by)).toLowerCase().includes(q));
+  $("drows").innerHTML=L.map(d=>`<tr><td class="wrap"><b>${esc(d.name)}</b></td><td class="wrap mute">${esc(d.file)}</td><td class="r num">${fsize(d.size)}</td><td>${esc(uname(d.by))}</td><td class="num">${new Date(d.ts).toLocaleString("en-GB",{hour12:false}).replace(",","")}</td><td><button class="ghost" type="button" data-act="dl" data-id="${d.id}">Download</button>${seesAll(u)||d.by===u.id?` <button class="ghost bad" type="button" data-act="ddel" data-id="${d.id}">Delete</button>`:""}</td></tr>`).join("");
+  $("dempty").hidden=L.length>0;
+}
+async function upPDF(){
+  const err=m=>{$("err").textContent=m};
+  const n=$("upn").value.replace(/\s+/g," ").trim(),f=$("upf").files&&$("upf").files[0];
+  if(!n)return err("Name the document first — a PDF cannot be uploaded without a name.");
+  if(n.length<3)return err("The name must be at least 3 characters.");
+  if(/[\\\/:*?"<>|\u0000-\u001f]/.test(n))return err('The name cannot contain \\ / : * ? " < > |');
+  if(st.docs.some(d=>d.name.toLowerCase()===n.toLowerCase()))return err("A document with this name already exists. Use a different name.");
+  if(!f)return err("Choose a PDF file.");
+  if(!/\.pdf$/i.test(f.name)||(f.type&&f.type!=="application/pdf"))return err("Only PDF files are accepted.");
+  if(!f.size)return err("This file is empty.");
+  if(f.size>MAXPDF)return err("This file is larger than 10 MB.");
+  const buf=await readBuf(f);let head="";
+  for(const b of new Uint8Array(buf.slice(0,1024)))head+=String.fromCharCode(b);
+  if(!head.includes("%PDF-"))return err("This file is not a real PDF, so it was not accepted.");
+  const id=uid();
+  try{await idb.put(id,buf)}catch(e){return err("This browser could not store the file (private window or storage full).")}
+  st.docs.push({id,name:n,file:f.name,size:f.size,by:me().id,ts:new Date().toISOString()});
+  log("doc.upload",`${n} · ${f.name} · ${fsize(f.size)}`);flash("PDF uploaded.");commit();
+}
+Object.assign(forms,{up:()=>{
+  if(upPDF.busy)return;upPDF.busy=1;
+  upPDF().catch(()=>{const e=$("err");if(e)e.textContent="Upload failed. Please try again."}).finally(()=>{upPDF.busy=0});
+}});
+Object.assign(acts,{
+  dl:async b=>{
+    const d=st.docs.find(x=>x.id===b.dataset.id);if(!d)return;
+    try{
+      const buf=await idb.get(d.id);
+      if(!buf)return flash("This file is not stored on this device.",1);
+      download(new Blob([buf],{type:"application/pdf"}),fname(d.name));
+      log("doc.download",d.name);save();
+    }catch(e){flash("Could not read the file.",1)}
+  },
+  ddel:async b=>{
+    const u=me(),d=st.docs.find(x=>x.id===b.dataset.id);if(!d||!(seesAll(u)||d.by===u.id))return;
+    const v=await ask("Delete “"+d.name+"”",[{k:"r",label:"Reason",req:1,attr:'maxlength="100"'}],"Delete");if(!v)return;
+    try{await idb.del(d.id)}catch(e){}
+    st.docs=st.docs.filter(x=>x.id!==d.id);log("doc.delete",`${d.name} – ${v.r}`);commit();
+  }
+});
+inputs.dq=renderDocs;
+
+/* =====================================================================
+   LOANS sought by the company from outside, and LEAVE applications
+   ===================================================================== */
+const LSTAT=["Sought","Approved","Declined","Disbursed","Repaid"];
+const LTYPE=["Bank","Microfinance","Individual","Supplier credit","Other"];
+const canLoans=u=>!!u&&(u.role==="manager"||u.role==="accountant");
+views.loans=()=>{
+  main(`<div class="cols"><section class="card"><h2>Record a loan sought</h2>
+  <form id="ln" novalidate>
+  <label>Lender / source<input id="lnl" maxlength="80" placeholder="e.g. Equity Bank" autocomplete="off"></label>
+  <label>Lender type<select id="lnt">${LTYPE.map(x=>`<option>${x}</option>`).join("")}</select></label>
+  <label>Purpose<input id="lnp" maxlength="120" placeholder="e.g. Working capital for trucks" autocomplete="off"></label>
+  <label>Currency<select id="lnc">${CURS.map(c=>`<option>${c}</option>`).join("")}</select></label>
+  <label>Amount sought<input id="lna" type="number" min="0.01" step="0.01" inputmode="decimal"></label>
+  <label>Interest rate, % per year <span class="mute">(optional)</span><input id="lnr" type="number" min="0" max="200" step="0.01" inputmode="decimal"></label>
+  <label>Repayment period, months <span class="mute">(optional)</span><input id="lnm" type="number" min="1" max="360" step="1" inputmode="numeric"></label>
+  <label>Notes <span class="mute">(optional)</span><input id="lnn" maxlength="160" autocomplete="off"></label>
+  <div class="note">Date applied is set automatically: <b class="num">${ago(0)}</b>. New loans start as <b>Sought</b>; update the status as the lender responds.</div>
+  <div class="err" id="err" role="alert"></div><button class="primary" type="submit">Save loan</button></form></section>
+  <section class="card"><h2>Loans sought</h2><div id="lsum" class="note" style="margin-bottom:8px"></div>
+  <div class="tw"><table><thead><tr><th>Date</th><th>Lender</th><th>Purpose</th><th class="r">Amount</th><th class="r">Rate</th><th class="r">Months</th><th>Status</th><th>Recorded by</th><th></th></tr></thead><tbody id="lrows"></tbody></table></div>
+  <div class="empty" id="lempty" hidden>No loans recorded yet.</div></section></div>`);
+  renderLoans();
+};
+function renderLoans(){
+  const u=me(),L=st.loans.slice().sort((a,b)=>b.d.localeCompare(a.d)||b.ts.localeCompare(a.ts));
+  $("lrows").innerHTML=L.map(x=>`<tr><td class="num">${x.d}</td><td class="wrap"><b>${esc(x.lender)}</b><div class="note">${esc(x.type)}${x.note?" · "+esc(x.note):""}</div></td><td class="wrap">${esc(x.purpose)}</td><td class="r num">${fmt(x.cur,x.amt)}</td><td class="r num">${x.rate==null?"—":x.rate+"%"}</td><td class="r num">${x.term==null?"—":x.term}</td><td><select data-chg="lstat" data-id="${x.id}" style="width:auto" aria-label="Status">${LSTAT.map(s=>`<option ${s===x.status?"selected":""}>${s}</option>`).join("")}</select></td><td>${esc(uname(x.by))}</td><td>${u.role==="manager"?`<button class="ghost bad" type="button" data-act="ldel" data-id="${x.id}">Delete</button>`:""}</td></tr>`).join("");
+  $("lempty").hidden=L.length>0;
+  const open=CURS.map(c=>{const t=rd(L.filter(x=>x.cur===c&&["Sought","Approved","Disbursed"].includes(x.status)).reduce((s,x)=>s+x.amt,0));return t?`<b class="num">${fmt(c,t)}</b>`:""}).filter(Boolean).join(" · ");
+  $("lsum").innerHTML=open?`Open loans (sought, approved or disbursed): ${open}`:"";
+}
+Object.assign(chg,{
+  lstat:el=>{
+    const u=me(),x=st.loans.find(l=>l.id===el.dataset.id);
+    if(!x||!canLoans(u))return render();
+    const old=x.status;x.status=el.value;x.sby=u.id;x.sts=new Date().toISOString();
+    log("loan.status",`${x.lender}: ${old} → ${x.status}`);save();renderLoans();flash("Status updated.");
+  },
+  uperm:el=>{
+    const t=user(el.dataset.u),p=el.dataset.p;
+    if(!t||me().role!=="manager"||(p!=="close"&&p!=="leave"))return render();
+    t[p]=el.checked;log("staff.authority",`${t.name}: ${p==="close"?"close month":"approve leave"} ${el.checked?"granted":"removed"}`);commit();
+  }
+});
+Object.assign(acts,{
+  ldel:async b=>{
+    const x=st.loans.find(l=>l.id===b.dataset.id);if(!x||me().role!=="manager")return;
+    const v=await ask("Delete loan record – "+x.lender,[{k:"r",label:"Reason",req:1,attr:'maxlength="100"'}],"Delete");if(!v)return;
+    st.loans=st.loans.filter(l=>l.id!==x.id);log("loan.delete",`${fmt(x.cur,x.amt)} ${x.lender} – ${v.r}`);commit();
+  }
+});
+
+/* ---------- leave ---------- */
+const LVTYPES=["Annual leave","Sick leave","Compassionate leave","Maternity / paternity","Unpaid leave","Other"];
+const MAXLEAVE=10;
+const LVCLS={pending:"pending",approved:"posted",rejected:"rejected",cancelled:"void"};
+const canApproveLeave=u=>!!u&&(u.role==="manager"||!!u.leave);
+const dparse=s=>{const[y,m,d]=s.split("-").map(Number);return Date.UTC(y,m-1,d)};
+const addDays=(s,n)=>{const t=new Date(dparse(s)+n*864e5);return t.getUTCFullYear()+"-"+pad(t.getUTCMonth()+1)+"-"+pad(t.getUTCDate())};
+const leaveDays=(a,b)=>Math.round((dparse(b)-dparse(a))/864e5)+1; // calendar days, first and last day included
+// nobody approves their own leave, unless there is no other authorised person
+const canDecide=(u,l)=>canApproveLeave(u)&&l.status==="pending"&&(l.by!==u.id||!st.users.some(x=>x.active&&x.id!==u.id&&canApproveLeave(x)));
+const pendingLeave=u=>canApproveLeave(u)?st.leaves.filter(l=>l.status==="pending").length:0;
+function leaveCalc(){
+  const f=$("lvf"),t=$("lve"),o=$("lvd");if(!f||!t||!o)return null;
+  if(!f.value||!t.value){o.textContent="";return null}
+  const n=leaveDays(f.value,t.value);
+  o.className="note num"+(n<1||n>MAXLEAVE?" out-t":"");
+  o.textContent=n<1?"The last day cannot be before the first day.":n>MAXLEAVE?`${n} days — more than the ${MAXLEAVE}-day limit.`:`${n} day${n>1?"s":""}`;
+  return n;
+}
+views.leave=()=>{
+  const u=me(),today=ago(0);
+  main(`<div class="cols"><section class="card"><h2>Apply for leave</h2>
+  <form id="lv" novalidate>
+  <div class="note">Applicant: <b>${esc(u.name)}</b> · applied on <b class="num">${today}</b> (automatic)</div>
+  <label>Leave type<select id="lvt">${LVTYPES.map(x=>`<option>${x}</option>`).join("")}</select></label>
+  <label>First day<input type="date" id="lvf" min="${today}" value="${today}"></label>
+  <label>Last day<input type="date" id="lve" min="${today}" value="${today}"></label>
+  <div class="note num" id="lvd"></div>
+  <label>Reason<input id="lvr" maxlength="140" autocomplete="off"></label>
+  <div class="note">One application can cover at most <b>${MAXLEAVE} days</b> (every calendar day from the first to the last day counts). It must be approved by the manager or by a person the manager has authorised.</div>
+  <div class="err" id="err" role="alert"></div><button class="primary" type="submit">Submit application</button></form></section>
+  <section class="card"><h2>${canApproveLeave(u)?"Leave applications":"My leave applications"}</h2>
+  <div class="tw"><table><thead><tr><th>Applied</th><th>Applicant</th><th>Type</th><th>From</th><th>To</th><th class="r">Days</th><th>Reason</th><th>Status</th><th></th></tr></thead><tbody id="lvrows"></tbody></table></div>
+  <div class="empty" id="lvempty" hidden>No leave applications.</div></section></div>`);
+  leaveCalc();renderLeave();
+};
+function renderLeave(){
+  const u=me(),today=ago(0);
+  const L=(canApproveLeave(u)?st.leaves:st.leaves.filter(l=>l.by===u.id)).slice().sort((a,b)=>b.ts.localeCompare(a.ts));
+  $("lvrows").innerHTML=L.map(l=>{
+    const own=l.by===u.id,canCancel=own&&(l.status==="pending"||(l.status==="approved"&&l.from>today));
+    return`<tr><td class="num">${l.d}</td><td>${esc(uname(l.by))}</td><td>${esc(l.type)}</td><td class="num">${l.from}</td><td class="num">${l.to}</td><td class="r num">${l.days}</td><td class="wrap">${esc(l.reason)}</td><td><span class="bd ${LVCLS[l.status]}">${l.status}</span>${l.dby?`<div class="note">by ${esc(uname(l.dby))}${l.dnote?" – "+esc(l.dnote):""}</div>`:""}</td><td>${canDecide(u,l)?`<button class="ghost" type="button" data-act="lapprove" data-id="${l.id}">Approve</button> <button class="ghost bad" type="button" data-act="lreject" data-id="${l.id}">Reject</button> `:""}${canCancel?`<button class="ghost bad" type="button" data-act="lcancel" data-id="${l.id}">Cancel</button>`:""}</td></tr>`}).join("");
+  $("lvempty").hidden=L.length>0;
+}
+Object.assign(forms,{
+  ln:()=>{
+    const u=me(),err=m=>{$("err").textContent=m};
+    if(!canLoans(u))return err("You cannot record loans.");
+    const lender=$("lnl").value.trim(),purpose=$("lnp").value.trim(),amt=rd(parseFloat($("lna").value)),r=$("lnr").value.trim(),m=$("lnm").value.trim();
+    if(!lender)return err("Enter the lender's name.");
+    if(!purpose)return err("Enter the purpose of the loan.");
+    if(!(amt>0))return err("Enter an amount above zero.");
+    if(amt>999999999999)return err("Amount is too large.");
+    let rate=null,term=null;
+    if(r!==""){rate=parseFloat(r);if(!(rate>=0&&rate<=200))return err("Interest rate must be between 0 and 200%.")}
+    if(m!==""){term=Number(m);if(!Number.isInteger(term)||term<1||term>360)return err("Repayment period must be 1–360 whole months.")}
+    const x={id:uid(),d:ago(0),lender,type:$("lnt").value,purpose,cur:$("lnc").value,amt,rate,term,note:$("lnn").value.trim(),status:"Sought",by:u.id,ts:new Date().toISOString()};
+    st.loans.push(x);log("loan.add",`${fmt(x.cur,amt)} · ${lender} · ${purpose}`);flash("Loan recorded.");commit();
+  },
+  lv:()=>{
+    const u=me(),err=m=>{$("err").textContent=m},f=$("lvf").value,t=$("lve").value,today=ago(0),r=$("lvr").value.trim();
+    if(!f||!t)return err("Choose the first and last day.");
+    if(f<today)return err("Leave cannot start in the past.");
+    const n=leaveDays(f,t);
+    if(n<1)return err("The last day cannot be before the first day.");
+    if(n>MAXLEAVE)return err(`A leave application cannot exceed ${MAXLEAVE} days. You asked for ${n}.`);
+    if(!r)return err("Give a reason for the leave.");
+    const clash=st.leaves.find(l=>l.by===u.id&&(l.status==="pending"||l.status==="approved")&&l.from<=t&&l.to>=f);
+    if(clash)return err(`This overlaps your ${clash.status} leave (${clash.from} to ${clash.to}).`);
+    st.leaves.push({id:uid(),by:u.id,type:$("lvt").value,from:f,to:t,days:n,reason:r,status:"pending",d:today,ts:new Date().toISOString()});
+    log("leave.apply",`${f} to ${t} (${n} day${n>1?"s":""}) · ${$("lvt").value}`);flash("Leave application submitted.");commit();
+  }
+});
+Object.assign(acts,{
+  lapprove:b=>{
+    const u=me(),l=st.leaves.find(x=>x.id===b.dataset.id);if(!l||!canDecide(u,l))return;
+    if(l.days>MAXLEAVE||leaveDays(l.from,l.to)>MAXLEAVE)return flash(`Leave cannot exceed ${MAXLEAVE} days.`,1);
+    l.status="approved";l.dby=u.id;l.dts=new Date().toISOString();
+    log("leave.approve",`${uname(l.by)} · ${l.from} to ${l.to}`);flash("Leave approved.");commit();
+  },
+  lreject:async b=>{
+    const u=me(),l=st.leaves.find(x=>x.id===b.dataset.id);if(!l||!canDecide(u,l))return;
+    const v=await ask("Reject leave – "+uname(l.by),[{k:"r",label:"Reason",req:1,attr:'maxlength="100"'}],"Reject");if(!v)return;
+    l.status="rejected";l.dby=u.id;l.dts=new Date().toISOString();l.dnote=v.r;
+    log("leave.reject",`${uname(l.by)} · ${l.from} to ${l.to} – ${v.r}`);commit();
+  },
+  lcancel:async b=>{
+    const u=me(),l=st.leaves.find(x=>x.id===b.dataset.id);
+    if(!l||l.by!==u.id||!(l.status==="pending"||(l.status==="approved"&&l.from>ago(0))))return;
+    const v=await ask(`Cancel leave ${l.from} to ${l.to}?`,[],"Cancel leave");if(!v)return;
+    l.status="cancelled";log("leave.cancel",`${l.from} to ${l.to}`);commit();
+  }
+});
+Object.assign(inputs,{
+  lvf:()=>{const f=$("lvf"),t=$("lve");if(f.value&&t.value&&t.value<f.value)t.value=f.value;if(f.value)t.min=f.value;leaveCalc()},
+  lve:leaveCalc
+});
+
+/* =====================================================================
+   BONDS REGISTRY — independent Excel-like grid, saved in its own table (st.bondsRegistry).
+   Uses its own state (ui.b), classes (.rc, data-bsel) and actions, so it never touches
+   the Consignments grid. Every row gets an automatic date (the day it was created) and the
+   month can be closed (locked) with its own table of closings (st.bondCloses), separate from
+   the Consignments month closings. Shared helpers only: gTsv, download, xlsx, monthOf, fmtMonth,
+   canCloseMonth.
+   ===================================================================== */
+const BCOLS=[
+  {k:"consignee",label:"Consignee names",req:1,max:80,w:190},
+  {k:"truck",label:"Truck number",req:1,max:15,w:120},
+  {k:"goods",label:"Goods description",req:1,max:120,w:220},
+  {k:"qty",label:"Quantity",req:1,num:1,w:100},
+  {k:"cvet",label:"Agent declaration (CVET)",max:30,ref:1,w:170},
+  {k:"cuda",label:"Customs declaration (CUDA)",max:30,ref:1,w:180},
+  {k:"remark",label:"Remark",max:200,w:200}
+];
+const BMAX=2000;
+st.bondCloses=st.bondCloses||[]; // table added in v6: older saved data gets it empty
+if(st.bondsRegistry.some(x=>!x.d)){ // rows saved before v6 had no date: use the day they were saved
+  st.bondsRegistry.forEach(x=>{if(!x.d)x.d=x.ts?iso(new Date(x.ts)):ago(0)});save();
+}
+const bClosed=m=>st.bondCloses.find(c=>c.m===m);
+const bLocked=d=>!!bClosed(monthOf(d));
+const bLastClosed=()=>st.bondCloses.reduce((a,c)=>c.m>a?c.m:a,"");
+const bNorm=(c,v)=>{
+  v=String(v==null?"":v).replace(/\s+/g," ").trim();
+  if(c.k==="truck")return v.toUpperCase();
+  if(c.num){const s=v.replace(/\s/g,"");return /^\d{1,3}(,\d{3})+(\.\d+)?$/.test(s)?s.replace(/,/g,""):s}
+  return v;
+};
+const bErr=(c,v)=>{
+  if(!v)return c.req?"Required":"";
+  if(v.length>(c.max||16))return"Too long (max "+(c.max||16)+" characters)";
+  if(c.k==="truck"&&!/^[A-Z0-9][A-Z0-9 \-\/]{2,14}$/.test(v))return"3–15 letters or numbers (spaces and hyphens allowed)";
+  if(c.num){if(!/^\d+(\.\d{1,3})?$/.test(v))return"Numbers only, up to 3 decimals";if(!(+v>0))return"Must be above zero";if(+v>999999999)return"Too large"}
+  if(c.ref&&!/^[A-Za-z0-9][A-Za-z0-9\/\-_. ]{1,29}$/.test(v))return"2–30 characters: letters, numbers, / - _ .";
+  return"";
+};
+const bBlank=r=>r.v.every(x=>!String(x).trim());
+const bNew=()=>({id:null,d:ago(0),v:BCOLS.map(()=>""),sel:false,touch:{}});
+const bVisible=r=>!ui.b.month||monthOf(r.d)===ui.b.month;
+function bLoad(keepMonth){
+  const rows=st.bondsRegistry.map(x=>({id:x.id,d:x.d,v:BCOLS.map(c=>x[c.k]==null?"":String(x[c.k])),sel:false,touch:{}}));
+  const cm=monthOf(ago(0));
+  if(!bLocked(ago(0)))while(rows.filter(r=>monthOf(r.d)===cm).length<5)rows.push(bNew());
+  ui.b={rows,dirty:false,show:false,by:sess,month:keepMonth==null?cm:keepMonth};
+}
+function bNormAll(){ui.b.rows.forEach(r=>{if(!bLocked(r.d))r.v=r.v.map((x,j)=>bNorm(BCOLS[j],x))})}
+function bErrors(){const out=[];ui.b.rows.forEach((r,i)=>{if(bBlank(r)||bLocked(r.d))return;BCOLS.forEach((c,j)=>{const m=bErr(c,bNorm(c,r.v[j]));if(m)out.push({i,j,m})})});return out}
+function bCellErr(r,j){if(bBlank(r)||bLocked(r.d)||!(ui.b.show||r.touch[j]))return"";const c=BCOLS[j];return bErr(c,bNorm(c,r.v[j]))}
+function bStat(){
+  const s=$("brstat");if(!s||!ui.b)return;
+  const L=ui.b.rows.filter(r=>bVisible(r)&&!bBlank(r));
+  s.innerHTML=`${L.length} row${L.length===1?"":"s"} in view · ${ui.b.dirty?'<span class="dirty">unsaved changes</span>':"saved"}`;
+  const t=$("brtot");if(!t)return;
+  const q=L.reduce((a,r)=>{const v=Number(bNorm(BCOLS[3],r.v[3]));return a+(isFinite(v)?v:0)},0);
+  t.innerHTML=L.length?`Total quantity in view: <b class="num">${q.toLocaleString("en-US",{maximumFractionDigits:3})}</b>`:"";
+}
+function bSummary(){
+  const s=$("brsum");if(!s||!ui.b)return;
+  if(!ui.b.show){s.textContent="";return}
+  const E=bErrors();
+  s.textContent=E.length?`${E.length} cell${E.length>1?"s":""} need fixing: `+E.slice(0,5).map(x=>`row ${x.i+1} · ${BCOLS[x.j].label} (${x.m})`).join("; ")+(E.length>5?"; …":""):"";
+}
+function bRowHTML(r,i,n){
+  const lk=bLocked(r.d);
+  return`<tr data-r="${i}"${r.sel||lk?` class="${[r.sel?"sel":"",lk?"lock":""].join(" ").trim()}"`:""}><td class="n"><input type="checkbox" tabindex="-1" data-bsel="${i}" ${r.sel?"checked":""}${lk?" disabled":""} aria-label="Select row ${n}">${n}</td><td class="gd num" title="${lk?"This month is closed":"Automatic date"}">${esc(r.d)}${lk?' <span class="bd closed">closed</span>':""}</td>`+
+    BCOLS.map((c,j)=>{const e=bCellErr(r,j);return`<td${e?` class="bad" title="${esc(e)}"`:""}><input class="rc${c.num?" r":""}" data-r="${i}" data-c="${j}" value="${esc(r.v[j])}" maxlength="${c.max||16}"${c.num?' inputmode="decimal"':""}${lk?" readonly":""} autocomplete="off" aria-label="${esc(c.label)}, row ${n}"${e?' aria-invalid="true"':""}></td>`}).join("")+"</tr>";
+}
+function renderBonds(){
+  const b=$("brb");if(!b||!ui.b)return;let n=0;
+  b.innerHTML=ui.b.rows.map((r,i)=>bVisible(r)?bRowHTML(r,i,++n):"").join("");
+  $("brempty").hidden=n>0;
+  const V=ui.b.rows.filter(bVisible),all=$("brall");if(all)all.checked=V.length>0&&V.every(r=>r.sel||bLocked(r.d));
+  bStat();bSummary();bBar();
+}
+function bPaint(i){
+  const tr=document.querySelector(`#brb tr[data-r="${i}"]`);if(!tr)return;const r=ui.b.rows[i];
+  tr.querySelectorAll("input.rc").forEach(el=>{
+    const e=bCellErr(r,+el.dataset.c),td=el.parentNode;
+    td.classList.toggle("bad",!!e);
+    if(e){td.title=e;el.setAttribute("aria-invalid","true")}else{td.removeAttribute("title");el.removeAttribute("aria-invalid")}
+  });
+}
+function bFocus(i,j){const el=document.querySelector(`#brb .rc[data-r="${i}"][data-c="${j}"]`);if(el){el.focus();el.select()}}
+function bBar(){
+  const el=$("brbar");if(!el||!ui.b)return;
+  const u=me(),today=ago(0),cm=monthOf(today),m=ui.b.month,cl=m&&bClosed(m);
+  const ms=[...new Set([cm,...st.bondsRegistry.map(x=>monthOf(x.d)),...ui.b.rows.map(r=>monthOf(r.d)),...st.bondCloses.map(c=>c.m)])].sort().reverse();
+  let act="";
+  if(m&&!cl&&canCloseMonth(u))act=`<button class="primary" type="button" data-act="bclose">Close ${esc(fmtMonth(m))}</button>`;
+  else if(cl&&u.role==="manager"&&cl.m===bLastClosed())act=`<button class="ghost bad" type="button" data-act="breopen">Reopen month</button>`;
+  el.innerHTML=`<div class="mbar"><div><span class="mute">Today (automatic date)</span><br><b>${esc(new Date(today+"T00:00:00").toLocaleDateString("en",{weekday:"long",day:"numeric",month:"long",year:"numeric"}))}</b></div>
+  <label>Month<select id="bmonth"><option value=""${m===""?" selected":""}>All months</option>${ms.map(x=>`<option value="${x}"${x===m?" selected":""}>${esc(fmtMonth(x))}${bClosed(x)?" (closed)":""}</option>`).join("")}</select></label>
+  <div>${m?(cl?`<span class="bd closed">Closed</span> <span class="note">by ${esc(uname(cl.by))} on ${esc(cl.ts.slice(0,10))}</span>`:'<span class="bd">Open</span>'):""}</div>
+  <div>${act}</div></div>
+  <div class="note" style="margin-bottom:10px">Closing a month locks its rows (no edits, no deletes) so the month's records stay in order. ${canCloseMonth(u)?"":"Only the manager, or staff the manager has authorised, can close a month."}</div>`;
+}
+function bAdd(col){
+  const cm=monthOf(ago(0));
+  if(bLocked(ago(0)))return flash(`${fmtMonth(cm)} is closed. A manager must reopen it before new rows can be added.`,1);
+  const R=ui.b.rows;if(R.length>=BMAX)return flash("Row limit reached ("+BMAX+").",1);
+  R.push(bNew());
+  if(ui.b.month&&ui.b.month!==cm){ui.b.month=cm;renderBonds();return bFocus(R.length-1,col||0)}
+  $("brb").insertAdjacentHTML("beforeend",bRowHTML(R[R.length-1],R.length-1,R.filter(bVisible).length));
+  $("brempty").hidden=true;const all=$("brall");if(all)all.checked=false;
+  bStat();bFocus(R.length-1,col||0);
+}
+function bDelete(){
+  ui.b.rows.forEach(r=>{if(bLocked(r.d))r.sel=false});
+  const n=ui.b.rows.filter(r=>r.sel).length;
+  if(!n)return flash("Tick the rows you want to delete first (rows in a closed month cannot be deleted).",1);
+  ui.b.rows=ui.b.rows.filter(r=>!r.sel);
+  const cm=monthOf(ago(0));
+  if(!bLocked(ago(0))&&!ui.b.rows.some(r=>monthOf(r.d)===cm))ui.b.rows.push(bNew());
+  ui.b.dirty=true;renderBonds();flash(`${n} row${n>1?"s":""} removed — press Save to keep the change.`);
+}
+async function bSave(){
+  if(bSave.busy||!ui.b)return;bSave.busy=1;
+  try{
+    const g=ui.b;bNormAll();
+    const E=bErrors();
+    if(E.length){g.show=true;const r0=g.rows[E[0].i];if(!bVisible(r0))g.month=monthOf(r0.d);renderBonds();bFocus(E[0].i,E[0].j);return flash(`${E.length} cell${E.length>1?"s":""} need fixing — marked in red.`,1)}
+    g.show=false;
+    if(g.rows.some(r=>!r.id&&!bBlank(r)&&bLocked(r.d)))return flash("A new row belongs to a closed month. Ask a manager to reopen it.",1);
+    const u=me(),now=new Date().toISOString(),prev=new Map(st.bondsRegistry.map(x=>[x.id,x]));
+    let add=0,chg=0;
+    const out=g.rows.filter(r=>!bBlank(r)).map(r=>{
+      const p=r.id&&prev.get(r.id);
+      if(p&&bLocked(p.d))return p; // closed month: never changed
+      const o={};BCOLS.forEach((c,j)=>{o[c.k]=c.num?Number(r.v[j]):r.v[j]});
+      if(p){if(BCOLS.every(c=>p[c.k]===o[c.k]))return p;chg++;return{...p,...o,uby:u.id,uts:now}}
+      add++;return{id:uid(),d:r.d,...o,by:u.id,ts:now};
+    });
+    const keep=new Set(out.map(o=>o.id)),gone=st.bondsRegistry.filter(x=>!keep.has(x.id));
+    if(gone.some(x=>bLocked(x.d)))return flash("Rows in a closed month cannot be removed.",1);
+    if(!add&&!chg&&!gone.length){g.dirty=false;renderBonds();return flash("Nothing has changed.")}
+    if(gone.length){const v=await ask(`Remove ${gone.length} saved row${gone.length>1?"s":""}?`,[],"Save");if(!v)return}
+    st.bondsRegistry=out;
+    log("bonds.save",`added ${add}, changed ${chg}, removed ${gone.length} · ${out.length} rows in table`);
+    flash(`Saved ${out.length} row${out.length===1?"":"s"}.`);ui.b.dirty=false;commit();
+  }finally{bSave.busy=0}
+}
+function bExport(){
+  const g=ui.b;if(!g)return;bNormAll();
+  const E=bErrors();
+  if(E.length){g.show=true;const r0=g.rows[E[0].i];if(!bVisible(r0))g.month=monthOf(r0.d);renderBonds();bFocus(E[0].i,E[0].j);return flash(`Fix the ${E.length} red cell${E.length>1?"s":""} before exporting.`,1)}
+  const R=g.rows.filter(r=>bVisible(r)&&!bBlank(r));if(!R.length)return flash("There are no rows to export in this view.",1);
+  const data=[["Date",...BCOLS.map(c=>c.label)],...R.map(r=>[r.d,...r.v.map((x,j)=>BCOLS[j].num?Number(x):x)])];
+  download(xlsx(data,[14,...BCOLS.map(c=>c.w/6)],"Bonds Registry"),`bonds-registry-${g.month||"all"}.xlsx`);
+  log("bonds.export",`${R.length} rows · ${g.month||"all months"}`);save();
+  flash(`Exported ${R.length} row${R.length>1?"s":""}${g.dirty?" (includes unsaved changes)":""}.`);
+}
+views.bonds=()=>{
+  if(!ui.b||ui.b.by!==sess||!ui.b.dirty)bLoad(ui.b&&ui.b.by===sess?ui.b.month:undefined); // a different user never inherits someone else's unsaved edits
+  main(`<section class="card"><h2>BONDS REGISTRY</h2>
+  <div id="brbar"></div>
+  <div class="note" style="margin-bottom:10px">Type straight into the cells. <b>Tab</b>, <b>Enter</b> and the <b>arrow keys</b> move between cells. Paste rows copied from Excel into any cell. Fields marked * are required. The date is added automatically when a row is created. Nothing is stored until you press <b>Save</b>.</div>
+  <div class="gtools"><button class="ghost" type="button" data-act="bondadd">+ Add row</button><button class="ghost bad" type="button" data-act="bonddel">Delete selected</button><button class="primary" type="button" data-act="bondsave">Save</button><button class="ghost" type="button" data-act="bondxlsx">Export .xlsx</button><span id="brstat" class="note"></span></div>
+  <div class="gw"><table class="grid bgrid"><colgroup><col style="width:60px"><col style="width:120px">${BCOLS.map(c=>`<col style="width:${c.w}px">`).join("")}</colgroup>
+  <thead><tr><th class="n"><input type="checkbox" id="brall" tabindex="-1" aria-label="Select all rows in view"></th><th>Date</th>${BCOLS.map(c=>`<th title="${esc(c.label)}">${esc(c.label)}${c.req?' <span class="out-t">*</span>':""}</th>`).join("")}</tr></thead><tbody id="brb"></tbody></table></div>
+  <div class="empty" id="brempty" hidden>No rows in this view yet. Press + Add row.</div>
+  <div class="note" id="brtot" style="margin-top:8px"></div>
+  <div class="gerr" id="brsum" role="alert"></div></section>`);
+  $("main").style.maxWidth="1400px";
+  renderBonds();
+};
+Object.assign(acts,{
+  bondadd:()=>bAdd(0),bonddel:bDelete,bondsave:bSave,bondxlsx:bExport,
+  bclose:async()=>{
+    const u=me(),g=ui.b,m=g&&g.month;
+    if(!canCloseMonth(u))return flash("You do not have authority to close a month.",1);
+    if(!m)return flash("Choose the month you want to close.",1);
+    if(bClosed(m))return flash("This month is already closed.",1);
+    if(g.dirty)return flash("Save your changes first, then close the month.",1);
+    const n=st.bondsRegistry.filter(x=>monthOf(x.d)===m).length;
+    if(!n)return flash("There are no saved bonds in this month to close.",1);
+    const early=[...new Set(st.bondsRegistry.map(x=>monthOf(x.d)))].filter(k=>k<m&&!bClosed(k)).sort();
+    if(early.length)return flash("Close earlier months first: "+early.map(fmtMonth).join(", ")+".",1);
+    const v=await ask(`Close ${fmtMonth(m)}? ${n} row${n>1?"s":""} will be locked${m===monthOf(ago(0))?" and no new rows can be added until it is reopened":""}.`,[{k:"n",label:"Note (optional)",attr:'maxlength="120"'}],"Close month");
+    if(!v||bClosed(m))return;
+    st.bondCloses.push({id:uid(),m,by:u.id,ts:new Date().toISOString(),rows:n,note:v.n});
+    log("bonds.month.close",`${fmtMonth(m)} · ${n} rows${v.n?" – "+v.n:""}`);flash(`${fmtMonth(m)} closed.`);commit();
+  },
+  breopen:async()=>{
+    const u=me(),m=ui.b&&ui.b.month,c=m&&bClosed(m);
+    if(!c)return;
+    if(u.role!=="manager")return flash("Only a manager can reopen a month.",1);
+    if(c.m!==bLastClosed())return flash("Reopen the most recent closed month first.",1);
+    const v=await ask(`Reopen ${fmtMonth(m)}`,[{k:"r",label:"Reason",req:1,attr:'maxlength="100"'}],"Reopen");if(!v)return;
+    st.bondCloses=st.bondCloses.filter(x=>x.id!==c.id);
+    log("bonds.month.reopen",`${fmtMonth(m)} – ${v.r}`);flash(`${fmtMonth(m)} reopened.`);commit();
+  }
+});
+inputs.bmonth=el=>{if(!ui.b||ui.b.month===el.value)return;ui.b.month=el.value;ui.b.rows.forEach(r=>{if(!bVisible(r))r.sel=false});renderBonds()};
+
+document.addEventListener("keydown",e=>{
+  const el=e.target;
+  if(!(el.classList&&el.classList.contains("rc"))||!ui.b||e.ctrlKey||e.metaKey||e.altKey)return;
+  const R=ui.b.rows,i=+el.dataset.r,j=+el.dataset.c,k=e.key,last=BCOLS.length-1;
+  const V=R.map((r,x)=>x).filter(x=>bVisible(R[x])),p=V.indexOf(i);
+  const go=(a,b)=>{e.preventDefault();bFocus(a,b)};
+  const len=el.value.length,s=el.selectionStart,t=el.selectionEnd;
+  if(k==="Enter"){
+    if(e.shiftKey){if(p>0)go(V[p-1],j);else e.preventDefault()}
+    else if(p<V.length-1)go(V[p+1],j);
+    else{e.preventDefault();if(!bBlank(R[i]))bAdd(j)}
+  }
+  else if(k==="ArrowDown"){if(p<V.length-1)go(V[p+1],j)}
+  else if(k==="ArrowUp"){if(p>0)go(V[p-1],j)}
+  else if(k==="ArrowLeft"){if(j>0&&s===0&&(t===0||t===len))go(i,j-1)}
+  else if(k==="ArrowRight"){if(j<last&&t===len&&(s===len||s===0))go(i,j+1)}
+  else if(k==="Tab"&&!e.shiftKey&&p===V.length-1&&j===last&&!bBlank(R[i])){e.preventDefault();bAdd(0)}
+});
+document.addEventListener("focusin",e=>{const el=e.target;if(el.classList&&el.classList.contains("rc"))setTimeout(()=>{if(document.activeElement===el)el.select()},0)});
+document.addEventListener("input",e=>{
+  const el=e.target;if(!(el.classList&&el.classList.contains("rc"))||!ui.b)return;
+  const i=+el.dataset.r;ui.b.rows[i].v[+el.dataset.c]=el.value;ui.b.dirty=true;bStat();bPaint(i);
+});
+document.addEventListener("change",e=>{
+  const el=e.target;if(!ui.b||!el.dataset)return;
+  if(el.classList.contains("rc")){
+    const i=+el.dataset.r,j=+el.dataset.c,r=ui.b.rows[i],v=bNorm(BCOLS[j],el.value);
+    el.value=v;r.v[j]=v;r.touch[j]=true;bPaint(i);bSummary();bStat();
+  }else if(el.dataset.bsel!==undefined){
+    const i=+el.dataset.bsel;ui.b.rows[i].sel=el.checked;el.closest("tr").classList.toggle("sel",el.checked);
+    const all=$("brall");if(all)all.checked=ui.b.rows.filter(bVisible).every(r=>r.sel||bLocked(r.d));
+  }else if(el.id==="brall"){ui.b.rows.forEach(r=>{if(bVisible(r)&&!bLocked(r.d))r.sel=el.checked});renderBonds()}
+});
+document.addEventListener("paste",e=>{
+  const el=e.target;if(!(el.classList&&el.classList.contains("rc"))||!ui.b)return;
+  const raw=((e.clipboardData||window.clipboardData).getData("text")||"").replace(/\r?\n$/,"");
+  if(!/[\t\r\n]/.test(raw))return; // a single value: let the browser paste it normally
+  e.preventDefault();
+  let M=gTsv(raw).map(row=>row.map(x=>x.replace(/\s*\n\s*/g," ")));
+  if(M[0].some(h=>BCOLS.some(c=>c.label.toLowerCase()===h.trim().toLowerCase())))M=M.slice(1); // skip a pasted header row
+  if(!M.length)return;
+  const R=ui.b.rows,V=R.map((r,x)=>x).filter(x=>bVisible(R[x])),r0=+el.dataset.r,c0=+el.dataset.c,p0=V.indexOf(r0),cm=monthOf(ago(0));
+  let msg="";
+  const extra=Math.max(0,p0+M.length-V.length);
+  if(extra&&bLocked(ago(0)))return flash(`${fmtMonth(cm)} is closed, so new rows cannot be added.`,1);
+  if(extra&&R.length+extra>BMAX){M=M.slice(0,V.length-p0+(BMAX-R.length));msg=` Stopped at the ${BMAX}-row limit.`}
+  for(let i=0;i<M.length;i++){const x=V[p0+i];if(x!==undefined&&bLocked(R[x].d))return flash("The pasted block reaches rows in a closed month. Nothing was pasted.",1)}
+  if(p0+M.length>V.length&&ui.b.month&&ui.b.month!==cm)ui.b.month=""; // show new rows next to the old ones
+  let cut=false;
+  M.forEach((row,i)=>{
+    let x=V[p0+i];if(x===undefined){R.push(bNew());x=R.length-1;V.push(x)}
+    const r=R[x];row.forEach((val,j)=>{const cj=c0+j;if(cj>=BCOLS.length){cut=true;return}r.v[cj]=bNorm(BCOLS[cj],val);r.touch[cj]=true});
+  });
+  ui.b.dirty=true;renderBonds();bFocus(r0,c0);
+  flash(`Pasted ${M.length} row${M.length>1?"s":""}.`+(cut?" Extra columns were ignored.":"")+msg);
+});
+window.addEventListener("beforeunload",e=>{if(ui.b&&ui.b.dirty){e.preventDefault();e.returnValue=""}});
+
+/* =====================================================================
+   PAYMENT RECORDS — independent Excel-like grid, saved in its own table (st.paymentRecords).
+   Own state (ui.p), own classes (.pc, data-psel), own actions and its own month closings
+   (st.paymentCloses), so it never touches the Consignments or Bonds grids.
+   Shared helpers only: gTsv, download, xlsx, monthOf, fmtMonth, canCloseMonth.
+   ===================================================================== */
+const PCOLS=[
+  {k:"consignee",label:"Consignee names",req:1,max:80,w:190},
+  {k:"truck",label:"Truck number",req:1,max:15,w:120},
+  {k:"ssp",label:"SSP payment",num:1,w:120},
+  {k:"adj",label:"Adjustment (SSP)",num:1,neg:1,w:130},
+  {k:"usd",label:"USD payment",num:1,w:120},
+  {k:"coc",label:"SSNBS-COC payment",num:1,w:140},
+  {k:"agent",label:"Agent fee payment",num:1,w:130},
+  {k:"wb",label:"Weight bridge payment (USD)",num:1,w:160},
+  {k:"remark",label:"Remark",opts:["Confirm","Reject"],w:130}
+];
+const PPAY=["ssp","usd","coc","agent","wb"].map(k=>PCOLS.findIndex(c=>c.k===k)); // a row needs at least one of these
+const PMAX=2000,PBIG=999999999999;
+st.paymentRecords=st.paymentRecords||[];st.paymentCloses=st.paymentCloses||[]; // tables added in v7: older saved data gets them empty
+const pClosed=m=>st.paymentCloses.find(c=>c.m===m);
+const pLocked=d=>!!pClosed(monthOf(d));
+const pLastClosed=()=>st.paymentCloses.reduce((a,c)=>c.m>a?c.m:a,"");
+const pNorm=(c,v)=>{
+  v=String(v==null?"":v).replace(/\s+/g," ").trim();
+  if(c.k==="truck")return v.toUpperCase();
+  if(c.opts){const l=v.toLowerCase();return c.opts.find(o=>o.toLowerCase()===l||o.toLowerCase()+"ed"===l)||v}
+  if(c.num){const s=v.replace(/\s/g,"");return /^-?\d{1,3}(,\d{3})+(\.\d+)?$/.test(s)?s.replace(/,/g,""):s}
+  return v;
+};
+const pErr=(c,v)=>{
+  if(!v)return c.req?"Required":"";
+  if(c.max&&v.length>c.max)return"Too long (max "+c.max+" characters)";
+  if(c.k==="truck"&&!/^[A-Z0-9][A-Z0-9 \-\/]{2,14}$/.test(v))return"3–15 letters or numbers (spaces and hyphens allowed)";
+  if(c.opts&&!c.opts.includes(v))return"Choose Confirm or Reject";
+  if(c.num){
+    if(!(c.neg?/^-?\d+(\.\d{1,2})?$/:/^\d+(\.\d{1,2})?$/).test(v))return c.neg?"Numbers only (minus allowed), up to 2 decimals":"Numbers only, up to 2 decimals";
+    if(Math.abs(+v)>PBIG)return"Too large";
+    if(!c.neg&&!(+v>0))return"Must be above zero";
+  }
+  return"";
+};
+const pBlank=r=>r.v.every(x=>!String(x).trim());
+const pNoPay=r=>PPAY.every(j=>!String(r.v[j]).trim());
+const pCell=(r,j)=>{const c=PCOLS[j],m=pErr(c,pNorm(c,r.v[j]));return m||(j===PPAY[0]&&pNoPay(r)?"Enter at least one payment amount":"")};
+const pNew=()=>({id:null,d:ago(0),v:PCOLS.map(()=>""),sel:false,touch:{}});
+const pVisible=r=>!ui.p.month||monthOf(r.d)===ui.p.month;
+function pLoad(keepMonth){
+  const rows=st.paymentRecords.map(x=>({id:x.id,d:x.d,v:PCOLS.map(c=>x[c.k]==null?"":String(x[c.k])),sel:false,touch:{}}));
+  const cm=monthOf(ago(0));
+  if(!pLocked(ago(0)))while(rows.filter(r=>monthOf(r.d)===cm).length<5)rows.push(pNew());
+  ui.p={rows,dirty:false,show:false,by:sess,month:keepMonth==null?cm:keepMonth};
+}
+function pNormAll(){ui.p.rows.forEach(r=>{if(!pLocked(r.d))r.v=r.v.map((x,j)=>pNorm(PCOLS[j],x))})}
+function pErrors(){const out=[];ui.p.rows.forEach((r,i)=>{if(pBlank(r)||pLocked(r.d))return;PCOLS.forEach((c,j)=>{const m=pCell(r,j);if(m)out.push({i,j,m})})});return out}
+function pCellErr(r,j){if(pBlank(r)||pLocked(r.d)||!(ui.p.show||r.touch[j]))return"";return pCell(r,j)}
+function pStat(){
+  const s=$("pstat");if(!s||!ui.p)return;
+  const L=ui.p.rows.filter(r=>pVisible(r)&&!pBlank(r));
+  s.innerHTML=`${L.length} row${L.length===1?"":"s"} in view · ${ui.p.dirty?'<span class="dirty">unsaved changes</span>':"saved"}`;
+  const t=$("ptot");if(!t)return;
+  const sums=PCOLS.map((c,j)=>c.num?[c,L.reduce((a,r)=>{const x=pNorm(c,r.v[j]),v=x===""?NaN:Number(x);return a+(isFinite(v)?v:0)},0)]:null).filter(Boolean);
+  t.innerHTML=L.length?"Totals in view: "+sums.map(([c,v])=>`${esc(c.label)} <b class="num">${v.toLocaleString("en-US",{minimumFractionDigits:2,maximumFractionDigits:2})}</b>`).join(" · "):"";
+}
+function pSummary(){
+  const s=$("psum");if(!s||!ui.p)return;
+  if(!ui.p.show){s.textContent="";return}
+  const E=pErrors();
+  s.textContent=E.length?`${E.length} cell${E.length>1?"s":""} need fixing: `+E.slice(0,5).map(x=>`row ${x.i+1} · ${PCOLS[x.j].label} (${x.m})`).join("; ")+(E.length>5?"; …":""):"";
+}
+function pRowHTML(r,i,n){
+  const lk=pLocked(r.d);
+  return`<tr data-r="${i}"${r.sel||lk?` class="${[r.sel?"sel":"",lk?"lock":""].join(" ").trim()}"`:""}><td class="n"><input type="checkbox" tabindex="-1" data-psel="${i}" ${r.sel?"checked":""}${lk?" disabled":""} aria-label="Select row ${n}">${n}</td><td class="gd num" title="${lk?"This month is closed":"Automatic date"}">${esc(r.d)}${lk?' <span class="bd closed">closed</span>':""}</td>`+
+    PCOLS.map((c,j)=>{
+      const e=pCellErr(r,j),at=`data-r="${i}" data-c="${j}" aria-label="${esc(c.label)}, row ${n}"${e?' aria-invalid="true"':""}`;
+      let el;
+      if(c.opts&&!lk){const cur=r.v[j];el=`<select class="pc" ${at}><option value=""></option>${c.opts.concat(cur&&!c.opts.includes(cur)?[cur]:[]).map(o=>`<option${o===cur?" selected":""}>${esc(o)}</option>`).join("")}</select>`}
+      else el=`<input class="pc${c.num?" r":""}" ${at} value="${esc(r.v[j])}" maxlength="${c.max||16}"${c.num?' inputmode="decimal"':""}${lk?" readonly":""} autocomplete="off">`;
+      return`<td${e?` class="bad" title="${esc(e)}"`:""}>${el}</td>`}).join("")+"</tr>";
+}
+function renderPay(){
+  const b=$("pb");if(!b||!ui.p)return;let n=0;
+  b.innerHTML=ui.p.rows.map((r,i)=>pVisible(r)?pRowHTML(r,i,++n):"").join("");
+  $("pempty").hidden=n>0;
+  const V=ui.p.rows.filter(pVisible),all=$("pall");if(all)all.checked=V.length>0&&V.every(r=>r.sel||pLocked(r.d));
+  pStat();pSummary();pBar();
+}
+function pPaint(i){
+  const tr=document.querySelector(`#pb tr[data-r="${i}"]`);if(!tr)return;const r=ui.p.rows[i];
+  tr.querySelectorAll(".pc").forEach(el=>{
+    const e=pCellErr(r,+el.dataset.c),td=el.parentNode;
+    td.classList.toggle("bad",!!e);
+    if(e){td.title=e;el.setAttribute("aria-invalid","true")}else{td.removeAttribute("title");el.removeAttribute("aria-invalid")}
+  });
+}
+function pFocus(i,j){const el=document.querySelector(`#pb .pc[data-r="${i}"][data-c="${j}"]`);if(el){el.focus();if(el.tagName==="INPUT")el.select()}}
+function pBar(){
+  const el=$("pbar");if(!el||!ui.p)return;
+  const u=me(),today=ago(0),cm=monthOf(today),m=ui.p.month,cl=m&&pClosed(m);
+  const ms=[...new Set([cm,...st.paymentRecords.map(x=>monthOf(x.d)),...ui.p.rows.map(r=>monthOf(r.d)),...st.paymentCloses.map(c=>c.m)])].sort().reverse();
+  let act="";
+  if(m&&!cl&&canCloseMonth(u))act=`<button class="primary" type="button" data-act="payclose">Close ${esc(fmtMonth(m))}</button>`;
+  else if(cl&&u.role==="manager"&&cl.m===pLastClosed())act=`<button class="ghost bad" type="button" data-act="payreopen">Reopen month</button>`;
+  el.innerHTML=`<div class="mbar"><div><span class="mute">Today (automatic date)</span><br><b>${esc(new Date(today+"T00:00:00").toLocaleDateString("en",{weekday:"long",day:"numeric",month:"long",year:"numeric"}))}</b></div>
+  <label>Month<select id="pmonth"><option value=""${m===""?" selected":""}>All months</option>${ms.map(x=>`<option value="${x}"${x===m?" selected":""}>${esc(fmtMonth(x))}${pClosed(x)?" (closed)":""}</option>`).join("")}</select></label>
+  <div>${m?(cl?`<span class="bd closed">Closed</span> <span class="note">by ${esc(uname(cl.by))} on ${esc(cl.ts.slice(0,10))}</span>`:'<span class="bd">Open</span>'):""}</div>
+  <div>${act}</div></div>
+  <div class="note" style="margin-bottom:10px">Closing a month locks its rows (no edits, no deletes) so the month's payment records stay in order. ${canCloseMonth(u)?"":"Only the manager, or staff the manager has authorised, can close a month."}</div>`;
+}
+function pAdd(col){
+  const cm=monthOf(ago(0));
+  if(pLocked(ago(0)))return flash(`${fmtMonth(cm)} is closed. A manager must reopen it before new rows can be added.`,1);
+  const R=ui.p.rows;if(R.length>=PMAX)return flash("Row limit reached ("+PMAX+").",1);
+  R.push(pNew());
+  if(ui.p.month&&ui.p.month!==cm){ui.p.month=cm;renderPay();return pFocus(R.length-1,col||0)}
+  $("pb").insertAdjacentHTML("beforeend",pRowHTML(R[R.length-1],R.length-1,R.filter(pVisible).length));
+  $("pempty").hidden=true;const all=$("pall");if(all)all.checked=false;
+  pStat();pFocus(R.length-1,col||0);
+}
+function pDelete(){
+  ui.p.rows.forEach(r=>{if(pLocked(r.d))r.sel=false});
+  const n=ui.p.rows.filter(r=>r.sel).length;
+  if(!n)return flash("Tick the rows you want to delete first (rows in a closed month cannot be deleted).",1);
+  ui.p.rows=ui.p.rows.filter(r=>!r.sel);
+  const cm=monthOf(ago(0));
+  if(!pLocked(ago(0))&&!ui.p.rows.some(r=>monthOf(r.d)===cm))ui.p.rows.push(pNew());
+  ui.p.dirty=true;renderPay();flash(`${n} row${n>1?"s":""} removed — press Save to keep the change.`);
+}
+async function pSave(){
+  if(pSave.busy||!ui.p)return;pSave.busy=1;
+  try{
+    const g=ui.p;pNormAll();
+    const E=pErrors();
+    if(E.length){g.show=true;const r0=g.rows[E[0].i];if(!pVisible(r0))g.month=monthOf(r0.d);renderPay();pFocus(E[0].i,E[0].j);return flash(`${E.length} cell${E.length>1?"s":""} need fixing — marked in red.`,1)}
+    g.show=false;
+    if(g.rows.some(r=>!r.id&&!pBlank(r)&&pLocked(r.d)))return flash("A new row belongs to a closed month. Ask a manager to reopen it.",1);
+    const u=me(),now=new Date().toISOString(),prev=new Map(st.paymentRecords.map(x=>[x.id,x]));
+    let add=0,chg=0;
+    const out=g.rows.filter(r=>!pBlank(r)).map(r=>{
+      const p=r.id&&prev.get(r.id);
+      if(p&&pLocked(p.d))return p; // closed month: never changed
+      const o={};PCOLS.forEach((c,j)=>{const x=r.v[j];o[c.k]=c.num?(x===""?null:Number(x)):x});
+      if(p){if(PCOLS.every(c=>p[c.k]===o[c.k]))return p;chg++;return{...p,...o,uby:u.id,uts:now}}
+      add++;return{id:uid(),d:r.d,...o,by:u.id,ts:now};
+    });
+    const keep=new Set(out.map(o=>o.id)),gone=st.paymentRecords.filter(x=>!keep.has(x.id));
+    if(gone.some(x=>pLocked(x.d)))return flash("Rows in a closed month cannot be removed.",1);
+    if(!add&&!chg&&!gone.length){g.dirty=false;renderPay();return flash("Nothing has changed.")}
+    if(gone.length){const v=await ask(`Remove ${gone.length} saved row${gone.length>1?"s":""}?`,[],"Save");if(!v)return}
+    st.paymentRecords=out;
+    log("payments.save",`added ${add}, changed ${chg}, removed ${gone.length} · ${out.length} rows in table`);
+    flash(`Saved ${out.length} row${out.length===1?"":"s"}.`);ui.p.dirty=false;commit();
+  }finally{pSave.busy=0}
+}
+function pExport(){
+  const g=ui.p;if(!g)return;pNormAll();
+  const E=pErrors();
+  if(E.length){g.show=true;const r0=g.rows[E[0].i];if(!pVisible(r0))g.month=monthOf(r0.d);renderPay();pFocus(E[0].i,E[0].j);return flash(`Fix the ${E.length} red cell${E.length>1?"s":""} before exporting.`,1)}
+  const R=g.rows.filter(r=>pVisible(r)&&!pBlank(r));if(!R.length)return flash("There are no rows to export in this view.",1);
+  const data=[["Date",...PCOLS.map(c=>c.label)],...R.map(r=>[r.d,...r.v.map((x,j)=>PCOLS[j].num&&x!==""?Number(x):x)])];
+  download(xlsx(data,[14,...PCOLS.map(c=>c.w/6)],"Payment Records"),`payment-records-${g.month||"all"}.xlsx`);
+  log("payments.export",`${R.length} rows · ${g.month||"all months"}`);save();
+  flash(`Exported ${R.length} row${R.length>1?"s":""}${g.dirty?" (includes unsaved changes)":""}.`);
+}
+views.pay=()=>{
+  if(!ui.p||ui.p.by!==sess||!ui.p.dirty)pLoad(ui.p&&ui.p.by===sess?ui.p.month:undefined); // a different user never inherits someone else's unsaved edits
+  main(`<section class="card"><h2>PAYMENT RECORDS</h2>
+  <div id="pbar"></div>
+  <div class="note" style="margin-bottom:10px">Type straight into the cells. <b>Tab</b>, <b>Enter</b> and the <b>arrow keys</b> move between cells (in Remark, press C or R, or click, to choose). Paste rows copied from Excel into any cell. Each row needs a consignee, a truck number and at least one payment. Adjustment (SSP) may be negative. The date is added automatically when a row is created. Nothing is stored until you press <b>Save</b>.</div>
+  <div class="gtools"><button class="ghost" type="button" data-act="payadd">+ Add row</button><button class="ghost bad" type="button" data-act="paydel">Delete selected</button><button class="primary" type="button" data-act="paysave">Save</button><button class="ghost" type="button" data-act="payxlsx">Export .xlsx</button><span id="pstat" class="note"></span></div>
+  <div class="gw"><table class="grid pgrid"><colgroup><col style="width:60px"><col style="width:120px">${PCOLS.map(c=>`<col style="width:${c.w}px">`).join("")}</colgroup>
+  <thead><tr><th class="n"><input type="checkbox" id="pall" tabindex="-1" aria-label="Select all rows in view"></th><th>Date</th>${PCOLS.map(c=>`<th title="${esc(c.label)}">${esc(c.label)}${c.req?' <span class="out-t">*</span>':""}</th>`).join("")}</tr></thead><tbody id="pb"></tbody></table></div>
+  <div class="empty" id="pempty" hidden>No rows in this view yet. Press + Add row.</div>
+  <div class="note" id="ptot" style="margin-top:8px"></div>
+  <div class="gerr" id="psum" role="alert"></div></section>`);
+  $("main").style.maxWidth="1500px";
+  renderPay();
+};
+Object.assign(acts,{
+  payadd:()=>pAdd(0),paydel:pDelete,paysave:pSave,payxlsx:pExport,
+  payclose:async()=>{
+    const u=me(),g=ui.p,m=g&&g.month;
+    if(!canCloseMonth(u))return flash("You do not have authority to close a month.",1);
+    if(!m)return flash("Choose the month you want to close.",1);
+    if(pClosed(m))return flash("This month is already closed.",1);
+    if(g.dirty)return flash("Save your changes first, then close the month.",1);
+    const n=st.paymentRecords.filter(x=>monthOf(x.d)===m).length;
+    if(!n)return flash("There are no saved payment records in this month to close.",1);
+    const early=[...new Set(st.paymentRecords.map(x=>monthOf(x.d)))].filter(k=>k<m&&!pClosed(k)).sort();
+    if(early.length)return flash("Close earlier months first: "+early.map(fmtMonth).join(", ")+".",1);
+    const v=await ask(`Close ${fmtMonth(m)}? ${n} row${n>1?"s":""} will be locked${m===monthOf(ago(0))?" and no new rows can be added until it is reopened":""}.`,[{k:"n",label:"Note (optional)",attr:'maxlength="120"'}],"Close month");
+    if(!v||pClosed(m))return;
+    st.paymentCloses.push({id:uid(),m,by:u.id,ts:new Date().toISOString(),rows:n,note:v.n});
+    log("payments.month.close",`${fmtMonth(m)} · ${n} rows${v.n?" – "+v.n:""}`);flash(`${fmtMonth(m)} closed.`);commit();
+  },
+  payreopen:async()=>{
+    const u=me(),m=ui.p&&ui.p.month,c=m&&pClosed(m);
+    if(!c)return;
+    if(u.role!=="manager")return flash("Only a manager can reopen a month.",1);
+    if(c.m!==pLastClosed())return flash("Reopen the most recent closed month first.",1);
+    const v=await ask(`Reopen ${fmtMonth(m)}`,[{k:"r",label:"Reason",req:1,attr:'maxlength="100"'}],"Reopen");if(!v)return;
+    st.paymentCloses=st.paymentCloses.filter(x=>x.id!==c.id);
+    log("payments.month.reopen",`${fmtMonth(m)} – ${v.r}`);flash(`${fmtMonth(m)} reopened.`);commit();
+  }
+});
+inputs.pmonth=el=>{if(!ui.p||ui.p.month===el.value)return;ui.p.month=el.value;ui.p.rows.forEach(r=>{if(!pVisible(r))r.sel=false});renderPay()};
+
+document.addEventListener("keydown",e=>{
+  const el=e.target;
+  if(!(el.classList&&el.classList.contains("pc"))||!ui.p||e.ctrlKey||e.metaKey||e.altKey)return;
+  const R=ui.p.rows,i=+el.dataset.r,j=+el.dataset.c,k=e.key,last=PCOLS.length-1,sel=el.tagName==="SELECT";
+  const V=R.map((r,x)=>x).filter(x=>pVisible(R[x])),p=V.indexOf(i);
+  const go=(a,b)=>{e.preventDefault();pFocus(a,b)};
+  const len=sel?0:el.value.length,s=sel?0:el.selectionStart,t=sel?0:el.selectionEnd;
+  if(k==="Enter"){
+    if(e.shiftKey){if(p>0)go(V[p-1],j);else e.preventDefault()}
+    else if(p<V.length-1)go(V[p+1],j);
+    else{e.preventDefault();if(!pBlank(R[i]))pAdd(j)}
+  }
+  else if(k==="ArrowDown"){if(p<V.length-1)go(V[p+1],j);else if(sel)e.preventDefault()}
+  else if(k==="ArrowUp"){if(p>0)go(V[p-1],j);else if(sel)e.preventDefault()}
+  else if(k==="ArrowLeft"){if(j>0&&(sel||(s===0&&(t===0||t===len))))go(i,j-1)}
+  else if(k==="ArrowRight"){if(j<last&&(sel||(t===len&&(s===len||s===0))))go(i,j+1)}
+  else if(k==="Tab"&&!e.shiftKey&&p===V.length-1&&j===last&&!pBlank(R[i])){e.preventDefault();pAdd(0)}
+});
+document.addEventListener("focusin",e=>{const el=e.target;if(el.classList&&el.classList.contains("pc")&&el.tagName==="INPUT")setTimeout(()=>{if(document.activeElement===el)el.select()},0)});
+document.addEventListener("input",e=>{
+  const el=e.target;if(!(el.classList&&el.classList.contains("pc"))||!ui.p)return;
+  const i=+el.dataset.r;ui.p.rows[i].v[+el.dataset.c]=el.value;ui.p.dirty=true;pStat();pPaint(i);
+});
+document.addEventListener("change",e=>{
+  const el=e.target;if(!ui.p||!el.dataset)return;
+  if(el.classList.contains("pc")){
+    const i=+el.dataset.r,j=+el.dataset.c,r=ui.p.rows[i],v=pNorm(PCOLS[j],el.value);
+    if(el.tagName==="INPUT")el.value=v;r.v[j]=v;r.touch[j]=true;ui.p.dirty=true;pPaint(i);pSummary();pStat();
+  }else if(el.dataset.psel!==undefined){
+    const i=+el.dataset.psel;ui.p.rows[i].sel=el.checked;el.closest("tr").classList.toggle("sel",el.checked);
+    const all=$("pall");if(all)all.checked=ui.p.rows.filter(pVisible).every(r=>r.sel||pLocked(r.d));
+  }else if(el.id==="pall"){ui.p.rows.forEach(r=>{if(pVisible(r)&&!pLocked(r.d))r.sel=el.checked});renderPay()}
+});
+document.addEventListener("paste",e=>{
+  const el=e.target;if(!(el.classList&&el.classList.contains("pc"))||!ui.p)return;
+  const raw=((e.clipboardData||window.clipboardData).getData("text")||"").replace(/\r?\n$/,"");
+  if(!/[\t\r\n]/.test(raw))return; // a single value: let the browser paste it normally
+  e.preventDefault();
+  let M=gTsv(raw).map(row=>row.map(x=>x.replace(/\s*\n\s*/g," ")));
+  if(M[0].some(h=>PCOLS.some(c=>c.label.toLowerCase()===h.trim().toLowerCase())))M=M.slice(1); // skip a pasted header row
+  if(!M.length)return;
+  const R=ui.p.rows,V=R.map((r,x)=>x).filter(x=>pVisible(R[x])),r0=+el.dataset.r,c0=+el.dataset.c,p0=V.indexOf(r0),cm=monthOf(ago(0));
+  let msg="";
+  const extra=Math.max(0,p0+M.length-V.length);
+  if(extra&&pLocked(ago(0)))return flash(`${fmtMonth(cm)} is closed, so new rows cannot be added.`,1);
+  if(extra&&R.length+extra>PMAX){M=M.slice(0,V.length-p0+(PMAX-R.length));msg=` Stopped at the ${PMAX}-row limit.`}
+  for(let i=0;i<M.length;i++){const x=V[p0+i];if(x!==undefined&&pLocked(R[x].d))return flash("The pasted block reaches rows in a closed month. Nothing was pasted.",1)}
+  if(p0+M.length>V.length&&ui.p.month&&ui.p.month!==cm)ui.p.month=""; // show new rows next to the old ones
+  let cut=false;
+  M.forEach((row,i)=>{
+    let x=V[p0+i];if(x===undefined){R.push(pNew());x=R.length-1;V.push(x)}
+    const r=R[x];row.forEach((val,j)=>{const cj=c0+j;if(cj>=PCOLS.length){cut=true;return}r.v[cj]=pNorm(PCOLS[cj],val);r.touch[cj]=true});
+  });
+  ui.p.dirty=true;renderPay();pFocus(r0,c0);
+  flash(`Pasted ${M.length} row${M.length>1?"s":""}.`+(cut?" Extra columns were ignored.":"")+msg);
+});
+window.addEventListener("beforeunload",e=>{if(ui.p&&ui.p.dirty){e.preventDefault();e.returnValue=""}});
+
+document.addEventListener("click",e=>{const b=e.target.closest("[data-act]");if(b&&acts[b.dataset.act])acts[b.dataset.act](b)});
+document.addEventListener("submit",e=>{if(forms[e.target.id]){e.preventDefault();forms[e.target.id]()}});
+["input","change"].forEach(ev=>document.addEventListener(ev,e=>{
+  const el=e.target;
+  if(ev==="change"&&el.dataset&&el.dataset.chg&&chg[el.dataset.chg])return chg[el.dataset.chg](el);
+  if(el.id&&inputs[el.id])inputs[el.id](el);
+}));
+render();
+</script>
+<script id="polish-js">
+/* ===== Cashbook UX add-on =====
+   Read-only helper: never touches st, ui, localStorage or any app function.
+   It only reads the DOM the app already renders and adds titles / ARIA hints. */
+(function(){
+  "use strict";
+  var app=document.getElementById("app");
+  if(!app||!window.MutationObserver)return;
+  var BASE="Cashbook";
+  var pending=false;
+
+  function enhance(){
+    pending=false;
+    try{
+      // 1. Browser tab title shows the current section
+      var on=app.querySelector("nav button.on");
+      document.title=on?on.textContent.replace(/\d+$/,"").trim()+" · "+BASE:BASE+" · Sign in";
+
+      // 2. Accessibility: mark current tab, label the nav landmark
+      var nav=app.querySelector("nav");
+      if(nav){nav.setAttribute("aria-label","Sections");}
+      app.querySelectorAll("nav button").forEach(function(b){
+        if(b.classList.contains("on"))b.setAttribute("aria-current","page");
+        else b.removeAttribute("aria-current");
+      });
+
+      // 3. Make wide tables obviously scrollable on small screens
+      app.querySelectorAll(".tw,.gw").forEach(function(w){
+        w.setAttribute("tabindex","0");
+        if(!w.getAttribute("role")){w.setAttribute("role","region");}
+        if(!w.getAttribute("aria-label")){w.setAttribute("aria-label","Scrollable table");}
+      });
+
+      // 4. Helpful hints on login fields
+      var pin=document.getElementById("lp");
+      if(pin){pin.setAttribute("placeholder","Enter your PIN");pin.setAttribute("aria-describedby","err");}
+
+      // 5. Money columns: right-aligned numbers read better when negatives stand out
+      app.querySelectorAll("td.num").forEach(function(td){
+        var t=td.textContent.trim();
+        if(t.charAt(0)==="\u2212"&&!td.classList.contains("out-t"))td.classList.add("out-t");
+      });
+    }catch(e){/* cosmetic only: never break the app */}
+  }
+
+  function schedule(){
+    if(pending)return;pending=true;
+    (window.requestAnimationFrame||setTimeout)(enhance);
+  }
+
+  new MutationObserver(schedule).observe(app,{childList:true,subtree:true});
+
+  // Keyboard: "/" focuses the first search box on the page (like most modern tools)
+  document.addEventListener("keydown",function(e){
+    if(e.key!=="/"||e.ctrlKey||e.metaKey||e.altKey)return;
+    var t=e.target,tag=(t&&t.tagName)||"";
+    if(tag==="INPUT"||tag==="SELECT"||tag==="TEXTAREA"||(t&&t.isContentEditable))return;
+    var s=document.querySelector('input[type="search"]');
+    if(s){e.preventDefault();s.focus();}
+  });
+
+  // Keep the sticky nav tucked under the sticky header whatever its real height is
+  function stick(){
+    var h=app.querySelector("header"),n=app.querySelector("nav");
+    if(h&&n&&window.innerWidth>820)n.style.top=h.offsetHeight+"px";
+    else if(n)n.style.top="";
+  }
+  window.addEventListener("resize",stick);
+  new MutationObserver(stick).observe(app,{childList:true});
+
+  schedule();stick();
+})();
+
+</script>
+</body>
+</html>
